@@ -465,7 +465,7 @@
                     {
                         "$id": "#/properties/pages/items/anyOf/0",
                         "type": "object",
-                        "title": "The typical page",
+                        "title": "PageElement",
                         "description": "A page associate a a page name with an identifier. The page identifier is then used in other objects to include them on a specific page.",
                         "default": {
                           "id": 1,
@@ -1151,7 +1151,7 @@
                                                 "message": {
                                                     "$id": "#/properties/controls/items/anyOf/0/properties/values/items/anyOf/0/properties/message",
                                                     "type": "object",
-                                                    "title": "The message schema",
+                                                    "title": "Message Element",
                                                     "description": "An explanation about the purpose of this instance.",
                                                     "default": {},
                                                     "examples": [
