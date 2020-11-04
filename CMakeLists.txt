@@ -91,11 +91,14 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/release/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/release/bin)
 
 ############
+
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(external/nlohmann_json)
+add_subdirectory(external/rtmidi rtmidi)
+add_subdirectory(external/moodycamel)
+
 #add_subdirectory(external/oscpack oscpack)
 #add_subdirectory(external/portaudio portaudio)
-#add_subdirectory(external/cJSON cjson)
-#add_subdirectory(external/rtmidi rtmidi)
-#add_subdirectory(external/moodycamel)
 
 
 add_subdirectory(electra)
