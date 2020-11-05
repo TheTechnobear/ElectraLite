@@ -56,6 +56,20 @@ namespace electra {
     /**
      * An explanation about the purpose of this instance.
      */
+    struct InputElement {
+        /**
+         * An explanation about the purpose of this instance.
+         */
+        int64_t pot_id;
+        /**
+         * An explanation about the purpose of this instance.
+         */
+        std::string value_id;
+    };
+
+    /**
+     * An explanation about the purpose of this instance.
+     */
     struct MessageElement {
         /**
          * An explanation about the purpose of this instance.
@@ -124,6 +138,10 @@ namespace electra {
         /**
          * An explanation about the purpose of this instance.
          */
+        std::vector<InputElement> inputs;
+        /**
+         * An explanation about the purpose of this instance.
+         */
         std::string name;
         /**
          * An explanation about the purpose of this instance.
@@ -132,15 +150,12 @@ namespace electra {
         /**
          * An explanation about the purpose of this instance.
          */
-        int64_t pot_id;
-        /**
-         * An explanation about the purpose of this instance.
-         */
         std::string type;
         /**
          * An explanation about the purpose of this instance.
          */
         std::vector<ValueElement> values;
+        nlohmann::json pot_id;
     };
 
     /**
@@ -273,6 +288,9 @@ namespace electra {
 }
 
 namespace nlohmann {
+    void from_json(const json & j, electra::InputElement & x);
+    void to_json(json & j, const electra::InputElement & x);
+
     void from_json(const json & j, electra::MessageElement & x);
     void to_json(json & j, const electra::MessageElement & x);
 
@@ -299,6 +317,17 @@ namespace nlohmann {
 
     void from_json(const json & j, electra::ElectraOne & x);
     void to_json(json & j, const electra::ElectraOne & x);
+
+    inline void from_json(const json & j, electra::InputElement& x) {
+        x.pot_id = j.at("potId").get<int64_t>();
+        x.value_id = j.at("valueId").get<std::string>();
+    }
+
+    inline void to_json(json & j, const electra::InputElement & x) {
+        j = json::object();
+        j["potId"] = x.pot_id;
+        j["valueId"] = x.value_id;
+    }
 
     inline void from_json(const json & j, electra::MessageElement& x) {
         x.device_id = j.at("deviceId").get<int64_t>();
@@ -337,11 +366,12 @@ namespace nlohmann {
         x.color = j.at("color").get<std::string>();
         x.control_set_id = j.at("controlSetId").get<int64_t>();
         x.id = j.at("id").get<int64_t>();
+        x.inputs = j.at("inputs").get<std::vector<electra::InputElement>>();
         x.name = j.at("name").get<std::string>();
         x.page_id = j.at("pageId").get<int64_t>();
-        x.pot_id = j.at("potId").get<int64_t>();
         x.type = j.at("type").get<std::string>();
         x.values = j.at("values").get<std::vector<electra::ValueElement>>();
+        x.pot_id = electra::get_untyped(j, "potId");
     }
 
     inline void to_json(json & j, const electra::ControlElement & x) {
@@ -350,11 +380,12 @@ namespace nlohmann {
         j["color"] = x.color;
         j["controlSetId"] = x.control_set_id;
         j["id"] = x.id;
+        j["inputs"] = x.inputs;
         j["name"] = x.name;
         j["pageId"] = x.page_id;
-        j["potId"] = x.pot_id;
         j["type"] = x.type;
         j["values"] = x.values;
+        j["potId"] = x.pot_id;
     }
 
     inline void from_json(const json & j, electra::DeviceElement& x) {

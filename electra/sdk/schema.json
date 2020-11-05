@@ -982,6 +982,7 @@
                             "pageId",
                             "controlSetId",
                             "potId",
+                            "inputs",
                             "values"
                         ],
                         "properties": {
@@ -1075,15 +1076,65 @@
                                     1
                                 ]
                             },
-                            "potId": {
-                                "$id": "#/properties/controls/items/anyOf/0/properties/potId",
-                                "type": "integer",
-                                "title": "The potId schema",
+                            "inputs": {
+                                "$id": "#/properties/controls/items/anyOf/0/properties/inputs",
+                                "type": "array",
+                                "title": "The inputs schema",
                                 "description": "An explanation about the purpose of this instance.",
-                                "default": 0,
+                                "default": [],
                                 "examples": [
-                                    1
-                                ]
+                                    [
+                                        {
+                                          "potId": 8,
+                                          "valueId": "value"
+                                        }
+                                    ]
+                                ],
+                                "items": {
+                                    "$id": "#/properties/controls/items/anyOf/0/properties/inputs/items",
+                                    "anyOf": [
+                                        {
+                                            "$id": "#/properties/controls/items/anyOf/0/properties/inputs/items/anyOf/0",
+                                            "type": "object",
+                                            "title": "The first anyOf schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": {},
+                                            "examples": [
+                                                {
+                                                  "potId": 8,
+                                                  "valueId": "value"
+                                                }
+                                            ],
+                                            "required": [
+                                                "potId",
+                                                "valueId"
+                                            ],
+                                            "properties": {
+                                                "potId": {
+                                                    "$id": "#/properties/controls/items/anyOf/0/properties/inputs/items/anyOf/0/properties/potId",
+                                                    "type": "integer",
+                                                    "title": "The potId schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        8
+                                                    ]
+                                                },
+                                                "valueId": {
+                                                    "$id": "#/properties/controls/items/anyOf/0/properties/inputs/items/anyOf/0/properties/valueId",
+                                                    "type": "string",
+                                                    "title": "The valueId schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "value"
+                                                    ]
+                                                }
+                                            },
+                                            "additionalProperties": true
+                                        }
+                                    ]
+                                }
                             },
                             "values": {
                                 "$id": "#/properties/controls/items/anyOf/0/properties/values",
