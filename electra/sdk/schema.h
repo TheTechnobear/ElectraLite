@@ -70,7 +70,7 @@ namespace electra {
     /**
      * An explanation about the purpose of this instance.
      */
-    struct MessageElement {
+    struct TheMessageSchema {
         /**
          * An explanation about the purpose of this instance.
          */
@@ -78,19 +78,27 @@ namespace electra {
         /**
          * An explanation about the purpose of this instance.
          */
-        int64_t max;
+        std::shared_ptr<int64_t> off_value;
         /**
          * An explanation about the purpose of this instance.
          */
-        int64_t min;
+        std::shared_ptr<int64_t> on_value;
         /**
          * An explanation about the purpose of this instance.
          */
-        int64_t parameter_number;
+        std::shared_ptr<int64_t> parameter_number;
         /**
          * An explanation about the purpose of this instance.
          */
         std::string type;
+        /**
+         * An explanation about the purpose of this instance.
+         */
+        std::shared_ptr<int64_t> max;
+        /**
+         * An explanation about the purpose of this instance.
+         */
+        std::shared_ptr<int64_t> min;
     };
 
     /**
@@ -100,25 +108,33 @@ namespace electra {
         /**
          * An explanation about the purpose of this instance.
          */
-        std::string id;
+        std::shared_ptr<int64_t> default_value;
         /**
          * An explanation about the purpose of this instance.
          */
-        int64_t max;
+        TheMessageSchema message;
         /**
          * An explanation about the purpose of this instance.
          */
-        MessageElement message;
+        std::shared_ptr<std::string> id;
         /**
          * An explanation about the purpose of this instance.
          */
-        int64_t min;
+        std::shared_ptr<int64_t> max;
+        /**
+         * An explanation about the purpose of this instance.
+         */
+        std::shared_ptr<int64_t> min;
+        /**
+         * An explanation about the purpose of this instance.
+         */
+        std::shared_ptr<int64_t> overlay_id;
     };
 
     /**
      * An explanation about the purpose of this instance.
      */
-    struct ControlElement {
+    struct TheSchema {
         /**
          * An explanation about the purpose of this instance.
          */
@@ -130,7 +146,7 @@ namespace electra {
         /**
          * An explanation about the purpose of this instance.
          */
-        int64_t control_set_id;
+        std::shared_ptr<int64_t> control_set_id;
         /**
          * An explanation about the purpose of this instance.
          */
@@ -138,15 +154,19 @@ namespace electra {
         /**
          * An explanation about the purpose of this instance.
          */
-        std::vector<InputElement> inputs;
+        std::shared_ptr<std::vector<InputElement>> inputs;
         /**
          * An explanation about the purpose of this instance.
          */
-        std::string name;
+        std::shared_ptr<std::string> mode;
         /**
          * An explanation about the purpose of this instance.
          */
-        int64_t page_id;
+        std::shared_ptr<std::string> name;
+        /**
+         * An explanation about the purpose of this instance.
+         */
+        std::shared_ptr<int64_t> page_id;
         /**
          * An explanation about the purpose of this instance.
          */
@@ -155,7 +175,10 @@ namespace electra {
          * An explanation about the purpose of this instance.
          */
         std::vector<ValueElement> values;
-        nlohmann::json pot_id;
+        /**
+         * An explanation about the purpose of this instance.
+         */
+        std::shared_ptr<int64_t> pot_id;
     };
 
     /**
@@ -191,7 +214,7 @@ namespace electra {
         /**
          * An explanation about the purpose of this instance.
          */
-        std::string color;
+        std::shared_ptr<std::string> color;
         /**
          * An explanation about the purpose of this instance.
          */
@@ -231,40 +254,37 @@ namespace electra {
     };
 
     /**
-     * A page associate a a page name with an identifier. The page identifier is then used in
-     * other objects to include them on a specific page.
+     * An explanation about the purpose of this instance.
      */
     struct PageElement {
         /**
-         * A unique identifier of the page. The identifier actually represent particular page within
-         * the array of 12 pages that Electra One can display.
+         * An explanation about the purpose of this instance.
          */
         int64_t id;
         /**
-         * A name of the page as it will be shown to the user on the status bar and on the page
-         * selection screen.
+         * An explanation about the purpose of this instance.
          */
         std::string name;
     };
 
     /**
-     * Full description of the Electra One preset format version 2
+     * The root schema comprises the entire JSON document.
      */
     struct ElectraOne {
         /**
          * An explanation about the purpose of this instance.
          */
-        std::vector<ControlElement> controls;
+        std::shared_ptr<std::vector<TheSchema>> controls;
         /**
          * An explanation about the purpose of this instance.
          */
-        std::vector<DeviceElement> devices;
+        std::shared_ptr<std::vector<DeviceElement>> devices;
         /**
          * An explanation about the purpose of this instance.
          */
         std::shared_ptr<std::vector<GroupElement>> groups;
         /**
-         * A name of the preset as it will be shown on Electra's status bar.
+         * An explanation about the purpose of this instance.
          */
         std::string name;
         /**
@@ -272,16 +292,15 @@ namespace electra {
          */
         std::shared_ptr<std::vector<OverlayElement>> overlays;
         /**
-         * A list of individual pages of the preset. A page is a collection of controls that are
-         * shown on the screen at one moment.
+         * An explanation about the purpose of this instance.
          */
-        std::vector<PageElement> pages;
+        std::shared_ptr<std::vector<PageElement>> pages;
         /**
-         * Identifier used by the Electra One editor to associate preset with an Editor project.
+         * An explanation about the purpose of this instance.
          */
         std::shared_ptr<std::string> project_id;
         /**
-         * A numeric representation of the preset file format.
+         * An explanation about the purpose of this instance.
          */
         int64_t version;
     };
@@ -291,14 +310,14 @@ namespace nlohmann {
     void from_json(const json & j, electra::InputElement & x);
     void to_json(json & j, const electra::InputElement & x);
 
-    void from_json(const json & j, electra::MessageElement & x);
-    void to_json(json & j, const electra::MessageElement & x);
+    void from_json(const json & j, electra::TheMessageSchema & x);
+    void to_json(json & j, const electra::TheMessageSchema & x);
 
     void from_json(const json & j, electra::ValueElement & x);
     void to_json(json & j, const electra::ValueElement & x);
 
-    void from_json(const json & j, electra::ControlElement & x);
-    void to_json(json & j, const electra::ControlElement & x);
+    void from_json(const json & j, electra::TheSchema & x);
+    void to_json(json & j, const electra::TheSchema & x);
 
     void from_json(const json & j, electra::DeviceElement & x);
     void to_json(json & j, const electra::DeviceElement & x);
@@ -329,58 +348,68 @@ namespace nlohmann {
         j["valueId"] = x.value_id;
     }
 
-    inline void from_json(const json & j, electra::MessageElement& x) {
+    inline void from_json(const json & j, electra::TheMessageSchema& x) {
         x.device_id = j.at("deviceId").get<int64_t>();
-        x.max = j.at("max").get<int64_t>();
-        x.min = j.at("min").get<int64_t>();
-        x.parameter_number = j.at("parameterNumber").get<int64_t>();
+        x.off_value = electra::get_optional<int64_t>(j, "offValue");
+        x.on_value = electra::get_optional<int64_t>(j, "onValue");
+        x.parameter_number = electra::get_optional<int64_t>(j, "parameterNumber");
         x.type = j.at("type").get<std::string>();
+        x.max = electra::get_optional<int64_t>(j, "max");
+        x.min = electra::get_optional<int64_t>(j, "min");
     }
 
-    inline void to_json(json & j, const electra::MessageElement & x) {
+    inline void to_json(json & j, const electra::TheMessageSchema & x) {
         j = json::object();
         j["deviceId"] = x.device_id;
-        j["max"] = x.max;
-        j["min"] = x.min;
+        j["offValue"] = x.off_value;
+        j["onValue"] = x.on_value;
         j["parameterNumber"] = x.parameter_number;
         j["type"] = x.type;
+        j["max"] = x.max;
+        j["min"] = x.min;
     }
 
     inline void from_json(const json & j, electra::ValueElement& x) {
-        x.id = j.at("id").get<std::string>();
-        x.max = j.at("max").get<int64_t>();
-        x.message = j.at("message").get<electra::MessageElement>();
-        x.min = j.at("min").get<int64_t>();
+        x.default_value = electra::get_optional<int64_t>(j, "defaultValue");
+        x.message = j.at("message").get<electra::TheMessageSchema>();
+        x.id = electra::get_optional<std::string>(j, "id");
+        x.max = electra::get_optional<int64_t>(j, "max");
+        x.min = electra::get_optional<int64_t>(j, "min");
+        x.overlay_id = electra::get_optional<int64_t>(j, "overlayId");
     }
 
     inline void to_json(json & j, const electra::ValueElement & x) {
         j = json::object();
+        j["defaultValue"] = x.default_value;
+        j["message"] = x.message;
         j["id"] = x.id;
         j["max"] = x.max;
-        j["message"] = x.message;
         j["min"] = x.min;
+        j["overlayId"] = x.overlay_id;
     }
 
-    inline void from_json(const json & j, electra::ControlElement& x) {
+    inline void from_json(const json & j, electra::TheSchema& x) {
         x.bounds = j.at("bounds").get<std::vector<int64_t>>();
         x.color = j.at("color").get<std::string>();
-        x.control_set_id = j.at("controlSetId").get<int64_t>();
+        x.control_set_id = electra::get_optional<int64_t>(j, "controlSetId");
         x.id = j.at("id").get<int64_t>();
-        x.inputs = j.at("inputs").get<std::vector<electra::InputElement>>();
-        x.name = j.at("name").get<std::string>();
-        x.page_id = j.at("pageId").get<int64_t>();
+        x.inputs = electra::get_optional<std::vector<electra::InputElement>>(j, "inputs");
+        x.mode = electra::get_optional<std::string>(j, "mode");
+        x.name = electra::get_optional<std::string>(j, "name");
+        x.page_id = electra::get_optional<int64_t>(j, "pageId");
         x.type = j.at("type").get<std::string>();
         x.values = j.at("values").get<std::vector<electra::ValueElement>>();
-        x.pot_id = electra::get_untyped(j, "potId");
+        x.pot_id = electra::get_optional<int64_t>(j, "potId");
     }
 
-    inline void to_json(json & j, const electra::ControlElement & x) {
+    inline void to_json(json & j, const electra::TheSchema & x) {
         j = json::object();
         j["bounds"] = x.bounds;
         j["color"] = x.color;
         j["controlSetId"] = x.control_set_id;
         j["id"] = x.id;
         j["inputs"] = x.inputs;
+        j["mode"] = x.mode;
         j["name"] = x.name;
         j["pageId"] = x.page_id;
         j["type"] = x.type;
@@ -405,7 +434,7 @@ namespace nlohmann {
 
     inline void from_json(const json & j, electra::GroupElement& x) {
         x.bounds = j.at("bounds").get<std::vector<int64_t>>();
-        x.color = j.at("color").get<std::string>();
+        x.color = electra::get_optional<std::string>(j, "color");
         x.name = j.at("name").get<std::string>();
         x.page_id = j.at("pageId").get<int64_t>();
     }
@@ -452,12 +481,12 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, electra::ElectraOne& x) {
-        x.controls = j.at("controls").get<std::vector<electra::ControlElement>>();
-        x.devices = j.at("devices").get<std::vector<electra::DeviceElement>>();
+        x.controls = electra::get_optional<std::vector<electra::TheSchema>>(j, "controls");
+        x.devices = electra::get_optional<std::vector<electra::DeviceElement>>(j, "devices");
         x.groups = electra::get_optional<std::vector<electra::GroupElement>>(j, "groups");
         x.name = j.at("name").get<std::string>();
         x.overlays = electra::get_optional<std::vector<electra::OverlayElement>>(j, "overlays");
-        x.pages = j.at("pages").get<std::vector<electra::PageElement>>();
+        x.pages = electra::get_optional<std::vector<electra::PageElement>>(j, "pages");
         x.project_id = electra::get_optional<std::string>(j, "projectId");
         x.version = j.at("version").get<int64_t>();
     }

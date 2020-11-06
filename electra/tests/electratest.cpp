@@ -49,7 +49,8 @@ public:
 int main(int argc, const char * argv[]) {
     signal(SIGINT, intHandler);
 
-    std::ifstream i("simpletest.epr");
+    std::cerr << "testing : " << argv[1] << std::endl;
+    std::ifstream i(argv[1]);
 
     nlohmann::json j;
     i >> j;
