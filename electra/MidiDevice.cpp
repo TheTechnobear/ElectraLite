@@ -286,6 +286,19 @@ bool MidiDevice::midiCallback(double, std::vector<unsigned char> *message) {
     return true;
 }
 
+
+bool MidiDevice::sendRaw(char* data, unsigned sz) {
+    // not implmented yet ;) 
+    std::cerr << "send SysEx :"; 
+    for(auto i=0;i<sz; i++) {
+        std::cerr << std::hex << data[i];
+    }
+    std::cerr << std::dec << std::endl; 
+    delete data;
+    return false;
+}
+
+
 bool MidiDevice::send(const MidiMsg &m) {
     if (midiOutDevice_ == nullptr || !isOutputOpen()) return false;
     std::vector<unsigned char> msg;

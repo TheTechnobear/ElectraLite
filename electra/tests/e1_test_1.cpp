@@ -7,6 +7,9 @@
 
 #include <fstream>
 
+#include "schema.h"
+
+
 static volatile bool keepRunning = 1;
 
 class TestCallback: public ElectraCallback {
@@ -43,7 +46,6 @@ public:
     void ch_pressure(unsigned v)            override    { std::cerr << "ch_pressure  : " << v  << std::endl;}
 };
 
-#include "schema.h"
 
 
 int main(int argc, const char * argv[]) {

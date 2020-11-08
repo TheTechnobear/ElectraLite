@@ -72,6 +72,7 @@ public:
     bool sendCC(unsigned ch, unsigned cc, unsigned v) { return send(MidiMsg(0xB0 + ch, cc, v)); }
     bool sendNoteOn(unsigned ch, unsigned note, unsigned vel) { return send(MidiMsg(int(0x90 + ch), note, vel)); }
     bool sendNoteOff(unsigned ch, unsigned note, unsigned vel) { return send(MidiMsg(int(0x80 + ch), note, vel)); }
+    bool sendRaw(char* data, unsigned sz);
 protected:
 
     bool queueInMsg(MidiMsg &msg) { return inQueue_.try_enqueue(msg);}
