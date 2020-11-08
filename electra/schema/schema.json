@@ -571,7 +571,7 @@
       "controls":{
          "$id":"#/properties/controls",
          "type":"array",
-         "title":"Control List",
+         "title":"Control",
          "description":"An array of controls. A control is a representation of one or more MIDI parameters or messages that can be controlled by the user.",
          "default":[
 

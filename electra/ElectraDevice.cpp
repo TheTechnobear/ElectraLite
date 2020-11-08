@@ -55,7 +55,7 @@ private:
     std::vector<std::shared_ptr<ElectraCallback>> callbacks_;
 
     MidiDevice device_;
-    electra::ElectraOne jsonData_;
+    electra::ElectraOnePreset jsonData_;
     ElectraMidiCallback midiCallback_;
     // moodycamel::ReaderWriterQueue<ElectraMessage> messageQueue_;
 };
@@ -118,7 +118,7 @@ void ElectraImpl_::uploadConfig(const std::string& json) {
 }
 
 void ElectraImpl_::uploadPreset(const std::string& json) {
-    sendSysEx(E1_T_PRESET, json.c_str(), json.length());
+    sendSysEx(E1_T_PRESET_1, json.c_str(), json.length());
 }
 
 void ElectraImpl_::requestInfo() {
@@ -130,7 +130,7 @@ void ElectraImpl_::requestConfig() {
 }
 
 void ElectraImpl_::requestPreset() {
-    sendSysEx(E1_T_PRESET, nullptr, 0);
+    sendSysEx(E1_T_PRESET_0, nullptr, 0);
 }
 
 unsigned ElectraImpl_::process(void) {
@@ -176,19 +176,19 @@ void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
 
 
     unsigned reqres = data[idx++];
-    if (reqres != E1_R_DATA || reqres != E1_R_REQ) {
-        std::cerr << "invalid msg type" << std::hex << reqres << std::dec << std::endl;
+    if (reqres != E1_R_DATA && reqres != E1_R_REQ) {
+        std::cerr << "invalid msg type " << std::hex << reqres << std::dec << std::endl;
     }
 
     unsigned datatype = data[idx++];
 
-    if(reqres==0x7f && datatype==0x7b) {
-        // invalid from firmware 1.1.6
-        std::cerr << "fudge info json resp" << std::endl;
-        reqres = E1_R_DATA;
-        datatype = E1_T_INFO;
-        idx--;
-    }
+    // if(reqres==0x7f && datatype==0x7b) {
+    //     // invalid from firmware 1.1.6
+    //     std::cerr << "fudge info json resp" << std::endl;
+    //     reqres = E1_R_DATA;
+    //     datatype = E1_T_INFO;
+    //     idx--;
+    // }
 
     switch (reqres) {
     case E1_R_DATA : {
@@ -198,7 +198,7 @@ void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
         json[jsonsz] = 0;
 
         switch (datatype) {
-        case E1_T_PRESET : {
+        case E1_T_PRESET_0 : {
             std::cerr << "preset json: " << json << std::endl;
             break;
         }

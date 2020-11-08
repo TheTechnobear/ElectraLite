@@ -103,7 +103,7 @@ void createControl(electra::Control& p) {
 }
 
 
-void buildPreset(electra::ElectraOne& p) {
+void buildPreset(electra::ElectraOnePreset& p) {
     p.version = 2;
     p.name = "Orac";
     p.project_id = std::make_shared<std::string>("Orac-e1-v1");
@@ -164,22 +164,20 @@ void buildPreset(electra::ElectraOne& p) {
 int main(int argc, const char * argv[]) {
     signal(SIGINT, intHandler);
 
-
-
     // device.addCallback(std::make_shared<TestCallback>());
     unsigned counter = 0;
     device.start();
     while (keepRunning) {
         if (counter == 1) {
-            // electra::ElectraOne preset;
-            // buildPreset(preset);
-            // nlohmann::json j;
-            // nlohmann::to_json(j, preset);
-            // std::cout << j.dump(4) << std::endl;
-            // device.uploadPreset(j.dump());
+            electra::ElectraOnePreset preset;
+            buildPreset(preset);
+            nlohmann::json j;
+            nlohmann::to_json(j, preset);
+            std::cout << j.dump(4) << std::endl;
+            device.uploadPreset(j.dump());
 
             // device.requestInfo();
-            device.requestConfig();
+            // device.requestConfig();
             // device.requestPreset();
         }
         device.process();

@@ -33,7 +33,8 @@ enum E1_REQRES {
 };
 
 enum E1_DATA_TYPE {
-    E1_T_PRESET  = 0x01,
+    E1_T_PRESET_0  = 0x00,
+    E1_T_PRESET_1  = 0x01,
     E1_T_CONFIG  = 0x02,
     E1_T_INFO    = 0x7F
 };
@@ -67,9 +68,9 @@ static const uint8_t E1_RES_Info[] = { E1_R_DATA, E1_T_INFO}; // 0xF0 0x00 0x21 
 //   ]
 // }
 
-static const uint8_t E1_UploadPreset[]       = { E1_R_DATA, E1_T_PRESET}; // 0xF0 0x00 0x21 0x45 0x01 0x00 preset-json-data 0xF7
-static const uint8_t E1_REQ_DownloadPreset[] = { E1_R_REQ,  E1_T_PRESET}; // 0xF0 0x00 0x21 0x45 0x02 0x00 0xF7
-static const uint8_t E1_RES_DownloadPreset[] = { E1_R_DATA, E1_T_PRESET}; // 0xF0 0x00 0x21 0x45 0x01 0x00 preset-json-data 0xF7
+static const uint8_t E1_UploadPreset[]       = { E1_R_DATA, E1_T_PRESET_1}; // 0xF0 0x00 0x21 0x45 0x01 0x00 preset-json-data 0xF7
+static const uint8_t E1_REQ_DownloadPreset[] = { E1_R_REQ,  E1_T_PRESET_0}; // 0xF0 0x00 0x21 0x45 0x02 0x00 0xF7
+static const uint8_t E1_RES_DownloadPreset[] = { E1_R_DATA, E1_T_PRESET_0}; // 0xF0 0x00 0x21 0x45 0x01 0x00 preset-json-data 0xF7
 
 /// config
 // see https://docs.electra.one/developers/configurationformat.html

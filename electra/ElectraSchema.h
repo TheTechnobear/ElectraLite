@@ -4,7 +4,7 @@
 //
 //  Then include this file, and then do
 //
-//     ElectraOne data = nlohmann::json::parse(jsonString);
+//     ElectraOnePreset data = nlohmann::json::parse(jsonString);
 
 #pragma once
 
@@ -273,7 +273,7 @@ namespace electra {
     /**
      * The Electra One preset is a definition of the preset layout and controls
      */
-    struct ElectraOne {
+    struct ElectraOnePreset {
         /**
          * An array of controls. A control is a representation of one or more MIDI parameters or
          * messages that can be controlled by the user.
@@ -345,8 +345,8 @@ namespace nlohmann {
     void from_json(const json & j, electra::Page & x);
     void to_json(json & j, const electra::Page & x);
 
-    void from_json(const json & j, electra::ElectraOne & x);
-    void to_json(json & j, const electra::ElectraOne & x);
+    void from_json(const json & j, electra::ElectraOnePreset & x);
+    void to_json(json & j, const electra::ElectraOnePreset & x);
 
     void from_json(const json & j, electra::Color & x);
     void to_json(json & j, const electra::Color & x);
@@ -506,7 +506,7 @@ namespace nlohmann {
         j["name"] = x.name;
     }
 
-    inline void from_json(const json & j, electra::ElectraOne& x) {
+    inline void from_json(const json & j, electra::ElectraOnePreset& x) {
         x.controls = electra::get_optional<std::vector<electra::Control>>(j, "controls");
         x.devices = electra::get_optional<std::vector<electra::Device>>(j, "devices");
         x.groups = electra::get_optional<std::vector<electra::Group>>(j, "groups");
@@ -517,7 +517,7 @@ namespace nlohmann {
         x.version = j.at("version").get<int64_t>();
     }
 
-    inline void to_json(json & j, const electra::ElectraOne & x) {
+    inline void to_json(json & j, const electra::ElectraOnePreset & x) {
         j = json::object();
         j["controls"] = x.controls;
         j["devices"] = x.devices;
