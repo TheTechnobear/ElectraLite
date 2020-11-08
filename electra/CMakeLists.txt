@@ -3,7 +3,6 @@ project(electralite)
 include_directories(
         "${PROJECT_SOURCE_DIR}/../external/moodycamel"
         "${PROJECT_SOURCE_DIR}/../external/rtmidi"
-        include_directories ("${PROJECT_SOURCE_DIR}/sdk")
         include_directories ("${PROJECT_SOURCE_DIR}/../external/nlohmann_json/single_include/nlohmann")
         #        "${PROJECT_SOURCE_DIR}/../../../external/portaudio"
         #        "${PROJECT_SOURCE_DIR}/../../../external/oscpack"

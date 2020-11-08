@@ -7,7 +7,7 @@
 
 #include <fstream>
 
-#include "schema.h"
+#include "ElectraSchema.h"
 
 
 static volatile bool keepRunning = 1;
@@ -41,12 +41,14 @@ class DumpMidiCallback : public MidiCallback {
 public:
     void noteOn(unsigned n, unsigned v)     override    { std::cerr << "note on      : " << n  << " - " << v << std::endl;}
     void noteOff(unsigned n, unsigned v)    override    { std::cerr << "note off     : " << n  << " - " << v << std::endl;}
-    void cc(unsigned cc, unsigned v)        override    { std::cerr << "cc           : " << cc << " - " << v << std::endl;  d.sendCC(0,2,v);}
+    void cc(unsigned cc, unsigned v)        override    { std::cerr << "cc           : " << cc << " - " << v << std::endl;}
     void pitchbend(int v)                   override    { std::cerr << "pitchbend    : " << v  << std::endl;}
     void ch_pressure(unsigned v)            override    { std::cerr << "ch_pressure  : " << v  << std::endl;}
 };
 
-
+static const char* E1_Midi_Device_Ctrl  = "Electra Controller Electra CTRL";
+static const char* E1_Midi_Device_Port1 = "Electra Controller Electra Port 1";
+static const char* E1_Midi_Device_Port2 = "Electra Controller Electra Port 2";
 
 int main(int argc, const char * argv[]) {
     signal(SIGINT, intHandler);
@@ -60,29 +62,13 @@ int main(int argc, const char * argv[]) {
     nlohmann::from_json(j, data);
     std::cerr << "project_id " << data.project_id << std::endl;
 
-
     DumpMidiCallback myCallback;
-    d.init(0);
-    unsigned counter = 0;
-    unsigned tc =0;
+    d.init(E1_Midi_Device_Port1,E1_Midi_Device_Port1);
     while (keepRunning) {
         d.processIn(myCallback);
         d.processOut();
         sleep(1);
     }
     d.deinit();
-
-
-
-
-    // device.addCallback(std::make_shared<TestCallback>());
-
-    // device.start();
-
-    // while(keepRunning) {
-    //     device.process();
-    //     sleep(1);
-    // }
-    // device.stop();
     return 0;
 }

@@ -7,7 +7,7 @@
 
 #include <fstream>
 
-#include "schema.h"
+#include "ElectraSchema.h"
 
 
 static volatile bool keepRunning = 1;
@@ -62,7 +62,7 @@ void createFader(electra::TheSchema& p, unsigned x, unsigned y, unsigned h, unsi
 }
 
 void createCCMessage(electra::TheMessageSchema& m, unsigned cc) {
-    m.device_id = 0;
+    m.device_id = 1;
     m.type = "cc7";
     m.parameter_number = std::make_shared<int64_t>(cc);
     m.off_value = std::make_shared<int64_t>(0);
@@ -75,29 +75,32 @@ void createValue(const std::string& id, electra::ValueElement& v) {
     v.id = std::make_shared<std::string>(id);
     v.min = std::make_shared<int64_t>(0);
     v.max = std::make_shared<int64_t>(100);
-    // v.default_value=std::make_shared<int64_t>(50);
-    // v.overlay_id=std::make_shared<int64_t>(0);
+    v.default_value = std::make_shared<int64_t>(0); //null
+    v.overlay_id = std::make_shared<int64_t>(0); // null
     createCCMessage(v.message, 1);
 }
 
 void createControl(electra::TheSchema& p) {
-    p.id = 0;
+    p.id = 1;
     createFader(p, 0, 0, 100, 100);
-    p.color = "red";
+    p.color = ElectraDevice::getColour(ElectraDevice::E_RED);
     p.control_set_id = std::make_shared<int64_t>(0);
     p.page_id = std::make_shared<int64_t>(0);
 
-    // p.mode = std::make_shared<std::string >> ("momentary"); // momentary for pad
-    p.name = std::make_shared<std::string>("cutoff");
+    p.mode = std::make_shared<std::string >(""); // null
+    // p.mode = std::make_shared<std::string >("momentary"); // momentary for pad
+    p.name = std::make_shared<std::string>("reso");
 
-    p.inputs = std::shared_ptr<std::vector<electra::InputElement>>() ;
+    p.inputs = std::make_shared<std::vector<electra::InputElement>>() ;
     electra::InputElement inp;
     inp.pot_id = 0;
     inp.value_id = "vid";
+    p.inputs->push_back(inp);
 
     electra::ValueElement val;
     createValue("vid", val);
     p.values.push_back(val);
+
     p.pot_id = std::make_shared<int64_t>(0); //?
 }
 
@@ -108,38 +111,38 @@ void buildPreset(electra::ElectraOne& p) {
     p.project_id = std::make_shared<std::string>("Orac-e1-v1");
 
     {
+        p.pages = std::make_shared < std::vector<electra::PageElement>>();
         electra::PageElement e;
         e.id = 0;
-        e.name = "page1";
-        p.pages = std::make_shared < std::vector<electra::PageElement>>();
+        e.name = "A1:page 1";
         p.pages->push_back(e);
     }
 
-
-    // {
-    //     electra::GroupElement e;
-    //     e.page_id=1;
-    //     e.name="group1"
-    //     create_bounds(bounds, x,y,h,w);
-    //     e.color=std::make_shared<std::string>="red";
-    //     p->groups=std::make_shared<std::vector<GroupElement>();
-    //     p->groups.push_back(e);
-    // }
+    {
+        p.groups = std::make_shared<std::vector<electra::GroupElement>>();
+        // electra::GroupElement e;
+        // e.page_id=1;
+        // e.name="group1"
+        // create_bounds(bounds, x,y,h,w);
+        // e.color=std::make_shared<std::string>=ElectraDevice::getColour(ElectraDevice::E_RED);
+        // p.groups.push_back(e);
+    }
 
     {
+        p.devices = std::make_shared < std::vector<electra::DeviceElement>>();
         electra::DeviceElement e;
-        e.id = 0;
-        e.name = "dev1";
+        e.id = 1;
+        e.name = "orac";
         e.channel = 1;
         e.port = 1;
-        p.devices = std::make_shared < std::vector<electra::DeviceElement>>();
         p.devices->push_back(e);
     }
 
     {
-        electra::OverlayElement e;
-        e.id = 0;
+        p.overlays = std::make_shared < std::vector<electra::OverlayElement>>();
 
+        electra::OverlayElement e;
+        e.id = 1;
         electra::ItemElement items[2];
         items[0].value = 0;
         items[0].label = "OFF";
@@ -147,16 +150,13 @@ void buildPreset(electra::ElectraOne& p) {
         items[1].label = "ON";
         e.items.push_back(items[0]);
         e.items.push_back(items[1]);
-
-
-        p.overlays = std::make_shared < std::vector<electra::OverlayElement>>();
         p.overlays->push_back(e);
     }
 
     {
+        p.controls = std::make_shared < std::vector<electra::TheSchema>>();
         electra::TheSchema e;
         createControl(e);
-        p.controls = std::make_shared < std::vector<electra::TheSchema>>();
         p.controls->push_back(e);
     }
 }
@@ -166,30 +166,27 @@ void buildPreset(electra::ElectraOne& p) {
 int main(int argc, const char * argv[]) {
     signal(SIGINT, intHandler);
 
-    // std::cerr << "testing : " << argv[1] << std::endl;
-    // std::ifstream i(argv[1]);
-
-    // nlohmann::json j;
-    // i >> j;
-    // electra::ElectraOne data;
-    // nlohmann::from_json(j, data);
-    // std::cerr << "project_id " << data.project_id << std::endl;
-
-
-    electra::ElectraOne preset;
-    buildPreset(preset);
-    nlohmann::json j;
-    nlohmann::to_json(j, preset);
-
-
 
 
     // device.addCallback(std::make_shared<TestCallback>());
-
+    unsigned counter = 0;
     device.start();
     while (keepRunning) {
+        if (counter == 1) {
+            // electra::ElectraOne preset;
+            // buildPreset(preset);
+            // nlohmann::json j;
+            // nlohmann::to_json(j, preset);
+            // std::cout << j.dump(4) << std::endl;
+            // device.uploadPreset(j.dump());
+
+            // device.requestInfo();
+            device.requestConfig();
+            // device.requestPreset();
+        }
         device.process();
         sleep(1);
+        counter++;
     }
     device.stop();
     return 0;

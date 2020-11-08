@@ -74,9 +74,9 @@ static constexpr int MAX_QUEUE_SIZE = 128;
 
 ////////////////////////////////////////////////
 void  MidiCallback::process(const MidiMsg& msg) {
-    unsigned status = msg.data[0];
-    unsigned data1  = msg.data[1];
-    unsigned data2  = msg.data[2];
+    unsigned status = msg.byte(0);
+    unsigned data1  = msg.byte(1);
+    unsigned data2  = msg.byte(2);
 
     unsigned ch = status & 0x0F;
     unsigned type = status & 0xF0;
@@ -113,11 +113,9 @@ void  MidiCallback::process(const MidiMsg& msg) {
     } //switch
 }
 
-
-
 ////////////////////////////////////////////////
 MidiDevice::MidiDevice() :
-    active_(false), inQueue_(MAX_QUEUE_SIZE),outQueue_(MAX_QUEUE_SIZE) {
+    active_(false), inQueue_(MAX_QUEUE_SIZE), outQueue_(MAX_QUEUE_SIZE) {
 }
 
 MidiDevice::~MidiDevice() {
@@ -136,12 +134,7 @@ RtMidiIn::RtMidiCallback MidiDevice::getMidiCallback() {
 }
 
 
-bool MidiDevice::init(void *arg) {
-    std::ifstream i("prefs.json");
-    json prefs;
-    i >> prefs; 
-
-
+bool MidiDevice::init(const char* indevice, const char* outdevice, bool virtualOutput) {
     if (active_) {
         deinit();
     }
@@ -149,8 +142,7 @@ bool MidiDevice::init(void *arg) {
 
     bool found = false;
 
-    std::string input_device = prefs["input device"];
-    if (!input_device.empty()) {
+    if (indevice != nullptr && strlen(indevice) > 0) {
 
         try {
             midiInDevice_.reset(new RtMidiIn(RtMidi::Api::UNSPECIFIED, "MEC MIDI IN DEVICE"));
@@ -161,18 +153,18 @@ bool MidiDevice::init(void *arg) {
         }
 
         unsigned port;
-        if (findMidiPortId(port, input_device.c_str(), false)) {
+        if (findMidiPortId(port, indevice, false)) {
             try {
                 midiInDevice_->openPort(port, "MIDI IN");
                 found = true;
-                LOG_1("Midi input opened : " << input_device);
+                LOG_1("Midi input opened : " << indevice);
             } catch (RtMidiError &error) {
                 LOG_0("Midi input open error:" << error.what());
                 midiInDevice_.reset();
                 return false;
             }
         } else {
-            LOG_0("Input device not found : [" << input_device << "]");
+            LOG_0("Input device not found : [" << indevice << "]");
             LOG_0("available devices:");
             for (unsigned i = 0; i < midiInDevice_->getPortCount(); i++) {
                 LOG_0("[" << midiInDevice_->getPortName(i) << "]");
@@ -180,14 +172,14 @@ bool MidiDevice::init(void *arg) {
             midiInDevice_.reset();
             return false;
         }
-
-        midiInDevice_->ignoreTypes(true, true, true);
+        bool midiSysex = false;
+        bool midiTime  = true;
+        bool midiSense = true;
+        midiInDevice_->ignoreTypes(midiSysex, midiTime, midiSense);
         midiInDevice_->setCallback(getMidiCallback(), this);
     } //midi input
 
-    std::string output_device = prefs["output device"];
-    if (!output_device.empty()) {
-        bool virt = prefs["virtual output"];
+    if (outdevice != nullptr && strlen(outdevice) > 0) {
         try {
             midiOutDevice_.reset(new RtMidiOut(RtMidi::Api::UNSPECIFIED, "MEC MIDI OUT DEVICE"));
         } catch (RtMidiError &error) {
@@ -195,10 +187,10 @@ bool MidiDevice::init(void *arg) {
             LOG_0("MidiDevice RtMidiOut ctor error:" << error.what());
             return false;
         }
-        if (virt) {
+        if (virtualOutput) {
             try {
-                midiOutDevice_->openVirtualPort("MIDI OUT");
-                LOG_0("Midi virtual output created : " << output_device);
+                midiOutDevice_->openVirtualPort(outdevice);
+                LOG_0("Midi virtual output created : " << outdevice);
                 virtualOpen_ = true;
             } catch (RtMidiError &error) {
                 LOG_0("Midi virtual output create error : " << error.what());
@@ -209,10 +201,10 @@ bool MidiDevice::init(void *arg) {
         } else {
             found = false;
             unsigned port;
-            if (findMidiPortId(port, input_device.c_str(), true)) {
+            if (findMidiPortId(port, outdevice, true)) {
                 try {
                     midiOutDevice_->openPort(port, "MIDI OUT");
-                    LOG_0("Midi output opened  :" << output_device);
+                    LOG_0("Midi output opened  :" << outdevice);
                     found = true;
                 } catch (RtMidiError &error) {
                     LOG_0("Midi output create error : " << error.what());
@@ -220,7 +212,7 @@ bool MidiDevice::init(void *arg) {
                     return false;
                 }
             } else {
-                LOG_0("Output device not found : [" << output_device << "]");
+                LOG_0("Output device not found : [" << outdevice << "]");
                 LOG_0("available devices : ");
                 for (unsigned i = 0; i < midiOutDevice_->getPortCount(); i++) {
                     LOG_0("[" << midiOutDevice_->getPortName(i) << "]");
@@ -243,19 +235,21 @@ bool MidiDevice::processIn(MidiCallback & cb) {
     MidiMsg msg;
     while (nextInMsg(msg)) {
         cb.process(msg);
+        msg.destroy();
     }
     return true;
 }
 
 bool MidiDevice::processOut() {
-    if (!active_) return false;
-
-    bool lastSend = true;
+    bool sendMsg = active_;
     MidiMsg msg;
-    while (lastSend && nextOutMsg(msg)) {
-        lastSend = send(msg);
+    while (nextOutMsg(msg)) {
+        if (sendMsg) {
+            sendMsg = send(msg);
+        }
+        msg.destroy();
     }
-    return lastSend;
+    return sendMsg;
 }
 
 void MidiDevice::deinit() {
@@ -270,45 +264,37 @@ bool MidiDevice::isActive() {
 }
 
 bool MidiDevice::midiCallback(double, std::vector<unsigned char> *message) {
-    int status = 0, data1 = 0, data2 = 0; //data3 = 0;
-    unsigned int n = message->size();
-    if (n > 3) LOG_0("midiCallback unexpect midi size" << n);
 
-    status = (int) message->at(0);
-    if (n > 1) data1 = (int) message->at(1);
-    if (n > 2) data2 = (int) message->at(2);
-//    if (n > 3) data3 = (int) message->at(3);
+    unsigned sz = message->size();
+    unsigned char* data= new unsigned char[sz];
+    memcpy(data,message->data(),sz);
 
-    MidiMsg msg(status, data1, data2);
-    if(!queueInMsg(msg)) {
+    // std::cerr << "MidiDevice::midiCallback" << std::hex << data[0] <<  " - " << message->at(0) << std::endl;
+    MidiMsg msg(data,sz);
+    if (!queueInMsg(msg)) {
         LOG_0("midiCallback unable to queue msg");
     }
     return true;
 }
 
 
-bool MidiDevice::sendRaw(char* data, unsigned sz) {
-    // not implmented yet ;) 
-    std::cerr << "send SysEx :"; 
-    for(auto i=0;i<sz; i++) {
-        std::cerr << std::hex << data[i];
-    }
-    std::cerr << std::dec << std::endl; 
-    delete data;
-    return false;
+bool MidiDevice::send(unsigned char* data, unsigned sz) {
+    // std::cerr << "send SysEx :";
+    // for (auto i = 0; i < sz; i++) {
+    //     std::cerr << std::hex << data[i];
+    // }
+    // std::cerr << std::dec << std::endl;
+    // delete data;
+
+    return queueOutMsg(MidiMsg(data,sz));
 }
 
 
 bool MidiDevice::send(const MidiMsg &m) {
     if (midiOutDevice_ == nullptr || !isOutputOpen()) return false;
-    std::vector<unsigned char> msg;
-
-    for (int i = 0; i < m.size; i++) {
-        msg.push_back(m.data[i]);
-    }
 
     try {
-        midiOutDevice_->sendMessage(&msg);
+        midiOutDevice_->sendMessage(m.data(), m.size());
     } catch (RtMidiError &error) {
         LOG_0("MidiDevice output write error:" << error.what());
         return false;
