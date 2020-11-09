@@ -12,7 +12,7 @@
 
 static volatile bool keepRunning = 1;
 
-class TestCallback: public ElectraCallback {
+class TestCallback: public ElectraLite::ElectraCallback {
 public:
     virtual ~TestCallback() = default;
 private:
@@ -21,7 +21,7 @@ private:
     }
 };
 
-ElectraDevice device;
+ElectraLite::ElectraDevice device;
 
 void intHandler(int dummy) {
     std::cerr << "ElectraTest intHandler called" << std::endl;
@@ -34,7 +34,7 @@ void intHandler(int dummy) {
 }
 
 
-class DumpElectraCallback  : public ElectraCallback {
+class DumpElectraCallback  : public ElectraLite::ElectraCallback {
 public:
     virtual ~DumpElectraCallback() = default;
     void onInit() override
@@ -88,7 +88,7 @@ void createValue(electra::Value& v) {
 void createControl(electra::Control& p) {
     p.id = 1;
     createFader(p, 0, 0, 100, 100);
-    p.color = std::make_shared<electra::Color>(ElectraDevice::getColour(ElectraDevice::E_RED));
+    p.color = std::make_shared<electra::Color>(ElectraLite::ElectraDevice::getColour(ElectraLite::ElectraDevice::E_RED));
     p.control_set_id = 1;
     p.page_id = 1;
 
@@ -127,7 +127,7 @@ void buildPreset(electra::ElectraOnePreset& p) {
         // e.page_id = 1;
         // e.name="group1";
         // createBounds(e.bounds, 0,0,10,10);
-        // p.color = std::make_shared<electra::Color>(ElectraDevice::getColour(ElectraDevice::E_RED));
+        // p.color = std::make_shared<electra::Color>(ElectraLite::ElectraDevice::getColour(ElectraLite::ElectraDevice::E_RED));
         // p.groups->push_back(e);
     }
 

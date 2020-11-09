@@ -13,6 +13,9 @@
 #include "ElectraSchema.h"
 
 
+namespace ElectraLite {
+
+
 static const char* E1_Midi_Device_Ctrl  = "Electra Controller Electra CTRL";
 static const char* E1_Midi_Device_Port1 = "Electra Controller Electra Port 1";
 static const char* E1_Midi_Device_Port2 = "Electra Controller Electra Port 2";
@@ -296,3 +299,5 @@ electra::Color ElectraDevice::getColour(ElectraDevice::Colour c) {
 unsigned ElectraDevice::process() {
     return impl_->process();
 }
+
+} // namespace

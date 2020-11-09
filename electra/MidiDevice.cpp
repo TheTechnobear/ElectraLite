@@ -17,6 +17,10 @@ extern unsigned int portInfo(snd_seq_t *seq, snd_seq_port_info_t *pinfo, unsigne
 #ifdef __linux__
 #include <alsa/asoundlib.h>
 
+
+
+
+
 // Imported from RtMidi library.
 
 bool findMidiPortId(unsigned &result, const std::string &portName, bool outputPort) {
@@ -68,7 +72,8 @@ bool findMidiPortId(unsigned &result, const std::string &portName, bool outputPo
 
 #endif // __linux__
 
-
+namespace ElectraLite {
+    
 static constexpr int MAX_QUEUE_SIZE = 128;
 
 
@@ -303,5 +308,5 @@ bool MidiDevice::send(const MidiMsg &m) {
 }
 
 
-
+}
 

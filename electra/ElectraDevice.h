@@ -5,6 +5,8 @@
 
 #include "ElectraSchema.h"
 
+
+namespace ElectraLite {
 class ElectraCallback {
 public:
     virtual ~ElectraCallback() = default;
@@ -51,3 +53,4 @@ private:
     ElectraImpl_* impl_;
 };
 
+}

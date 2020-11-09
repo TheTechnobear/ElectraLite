@@ -9,6 +9,9 @@
 
 #include <atomic>
 
+
+namespace ElectraLite {
+
 class MidiMsg {
 public:
     //Note: MidiMsg does not OWN data
@@ -75,23 +78,17 @@ private:
 };
 
 
-class ICallback {
+class MidiCallback {
 public:
-    ICallback () = default;
-    virtual ~ICallback () = default;
-    virtual void process(const MidiMsg& msg) = 0;
-};
-
-
-class MidiCallback : public ICallback {
-public:
+    MidiCallback () = default;
+    virtual ~MidiCallback () = default;    
     virtual void noteOn(unsigned n, unsigned v)  { ; }
     virtual void noteOff(unsigned n, unsigned v) { ; }
     virtual void cc(unsigned cc, unsigned v) { ; }
     virtual void pitchbend(int v)  { ; } // +/- 8192
     virtual void ch_pressure(unsigned v) { ; }
 
-    void process(const MidiMsg& msg) override;
+    virtual void process(const MidiMsg& msg);
 };
 
 
@@ -142,3 +139,6 @@ protected:
     moodycamel::ReaderWriterQueue<MidiMsg> outQueue_;
     moodycamel::ReaderWriterQueue<MidiMsg> inQueue_;
 };
+
+
+}

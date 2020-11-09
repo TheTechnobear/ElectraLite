@@ -12,16 +12,6 @@
 
 static volatile bool keepRunning = 1;
 
-class TestCallback: public ElectraCallback {
-public:
-    virtual ~TestCallback() = default;
-private:
-    void onError(unsigned, const char* err) override {
-        std::cerr << err << std::endl;
-    }
-};
-
-ElectraDevice device;
 
 void intHandler(int dummy) {
     std::cerr << "ElectraTest intHandler called" << std::endl;
@@ -35,9 +25,9 @@ void intHandler(int dummy) {
 
 
 
-MidiDevice d;
+ElectraLite::MidiDevice d;
 
-class DumpMidiCallback : public MidiCallback {
+class DumpMidiCallback : public ElectraLite::MidiCallback {
 public:
     void noteOn(unsigned n, unsigned v)     override    { std::cerr << "note on      : " << n  << " - " << v << std::endl;}
     void noteOff(unsigned n, unsigned v)    override    { std::cerr << "note off     : " << n  << " - " << v << std::endl;}

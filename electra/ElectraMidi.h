@@ -2,6 +2,11 @@
 
 #include <cstdint>
 
+
+
+
+namespace ElectraLite {
+
 // Electra sysex implmentation
 // https://docs.electra.one/developers/midiimplementation.html#get-electra-info
 
@@ -123,5 +128,5 @@ static const uint8_t E1_UploadConfig[]       = { E1_R_DATA, E1_T_CONFIG}; // 0xF
 static const uint8_t E1_REQ_DownloadConfig[] = { E1_R_REQ,  E1_T_CONFIG}; // 0xF0 0x00 0x21 0x45 0x02 0x02 0xF7
 static const uint8_t E1_RES_DownloadConfig[] = { E1_R_DATA, E1_T_CONFIG}; // 0xF0 0x00 0x21 0x45 0x01 0x02 configuration-json-data 0xF7
 
-
+} //namespace
 
