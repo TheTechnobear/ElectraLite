@@ -3,16 +3,17 @@
 #include <memory>
 #include <vector>
 
+#include "ElectraSchema.h"
 
 class ElectraCallback {
 public:
     virtual ~ElectraCallback() = default;
     virtual void onInit()   {;}
     virtual void onDeinit() {;}
+    virtual void onError(unsigned err, const char *errStr) {;}
     virtual void onInfo(const std::string& json) {;}
     virtual void onPreset(const std::string& json) {;}
     virtual void onConfig(const std::string& json) {;}
-    virtual void onError(unsigned err, const char *errStr) {;}
 };
 
 class ElectraImpl_;
@@ -42,7 +43,7 @@ public:
         E_PINK,
         E_MAX_COLOR
     };
-    static std::string getColour(ElectraDevice::Colour c);
+    static electra::Color getColour(ElectraDevice::Colour c);
 
 
     void addCallback(std::shared_ptr<ElectraCallback>);

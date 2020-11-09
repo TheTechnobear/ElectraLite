@@ -20,6 +20,7 @@ static const char* E1_Midi_Device_Port2 = "Electra Controller Electra Port 2";
 
 class ElectraMidiCallback : public MidiCallback {
 public:
+    ElectraMidiCallback(ElectraImpl_* parent) : parent_(parent) { ; }
     // void noteOn(unsigned n, unsigned v)     override    { std::cerr << "note on      : " << n  << " - " << v << std::endl;}
     // void noteOff(unsigned n, unsigned v)    override    { std::cerr << "note off     : " << n  << " - " << v << std::endl;}
     // void cc(unsigned cc, unsigned v)        override    { std::cerr << "cc           : " << cc << " - " << v << std::endl;}
@@ -27,6 +28,8 @@ public:
     // void ch_pressure(unsigned v)            override    { std::cerr << "ch_pressure  : " << v  << std::endl;}
     void process(const MidiMsg& msg) override;
     void sysex(const unsigned char* data, unsigned sz);
+private:
+    ElectraImpl_* parent_;
 };
 
 class ElectraImpl_ {
@@ -37,7 +40,7 @@ public:
     void start(void);
     void stop(void);
 
-    static std::string getColour(ElectraDevice::Colour c);
+    static electra::Color getColour(ElectraDevice::Colour c);
     void uploadConfig(const std::string& json);
     void uploadPreset(const std::string& json);
     void requestInfo();
@@ -49,45 +52,53 @@ public:
     void addCallback(std::shared_ptr<ElectraCallback> cb) { callbacks_.push_back(cb);}
 
 private:
+    friend class ElectraMidiCallback;
 
     void sendSysEx(unsigned type, const char* data, unsigned len);
+
+    void onInfo(const std::string& json);
+    void onPreset(const std::string& json);
+    void onConfig(const std::string& json);
+
 
     std::vector<std::shared_ptr<ElectraCallback>> callbacks_;
 
     MidiDevice device_;
     electra::ElectraOnePreset jsonData_;
     ElectraMidiCallback midiCallback_;
-    // moodycamel::ReaderWriterQueue<ElectraMessage> messageQueue_;
 };
 
 //---------------------
-ElectraImpl_::ElectraImpl_()
-// :   messageQueue_(100)
+ElectraImpl_::ElectraImpl_() :midiCallback_(this)
 {
 }
 
 void ElectraImpl_::start() {
     device_.init(E1_Midi_Device_Ctrl, E1_Midi_Device_Ctrl);
+    for (auto cb : callbacks_) {
+        cb->onInit();
+    }
 }
 
-
-std::string  ElectraImpl_::getColour(ElectraDevice::Colour c) {
+electra::Color  ElectraImpl_::getColour(ElectraDevice::Colour c) {
     switch (c) {
-    case ElectraDevice::E_WHITE    : { return "FFFFFF";}
-    case ElectraDevice::E_RED      : { return "F45C51";}
-    case ElectraDevice::E_ORANGE   : { return "F49500";}
-    case ElectraDevice::E_BLUE     : { return "529DEC";}
-    case ElectraDevice::E_GREEN    : { return "03A598";}
-    case ElectraDevice::E_PINK     : { return "C44795";}
+    case ElectraDevice::E_WHITE    : { return electra::Color::Ffffff;}
+    case ElectraDevice::E_RED      : { return electra::Color::F45C51;}
+    case ElectraDevice::E_ORANGE   : { return electra::Color::F49500;}
+    case ElectraDevice::E_BLUE     : { return electra::Color::The529DEC;}
+    case ElectraDevice::E_GREEN    : { return electra::Color::The03A598;}
+    case ElectraDevice::E_PINK     : { return electra::Color::C44795;}
     default:
         ;
     }
-    return "FFFFFF";
-
+    return electra::Color::Ffffff;
 }
 
 
 void ElectraImpl_::stop() {
+    for (auto cb : callbacks_) {
+        cb->onDeinit();
+    }
     device_.deinit();
 }
 
@@ -113,6 +124,25 @@ void ElectraImpl_::sendSysEx(unsigned type, const char* data, unsigned len) {
 
 
 
+void ElectraImpl_::onInfo(const std::string& json) {
+    for (auto cb : callbacks_) {
+        cb->onInfo(json);
+    }
+}
+
+void ElectraImpl_::onPreset(const std::string& json) {
+    for (auto cb : callbacks_) {
+        cb->onPreset(json);
+    }
+
+}
+
+void ElectraImpl_::onConfig(const std::string& json) {
+    for (auto cb : callbacks_) {
+        cb->onConfig(json);
+    }
+}
+
 void ElectraImpl_::uploadConfig(const std::string& json) {
     sendSysEx(E1_T_CONFIG, json.c_str(), json.length());
 }
@@ -137,22 +167,14 @@ unsigned ElectraImpl_::process(void) {
     unsigned count = 0;
     device_.processIn(midiCallback_);
     device_.processOut();
-    // while (messageQueue_.try_dequeue(frame)) {
-    //     count++;
-    //     for (auto cb : callbacks_) {
-    //         // cb->onFrame();
-    //     }
-    // }
     return count;
 }
 
 void ElectraMidiCallback::process(const MidiMsg& msg) {
     unsigned status = msg.byte(0);
     if (status == 0xF0) {
-        std::cerr << "ElectraMidiCallback::process sysex" << std::endl;
         sysex(msg.data(), msg.size());
     } else {
-        std::cerr << "ElectraMidiCallback::process non-sysex " << std::hex << status << std::endl;
         MidiCallback::process(msg);
     }
 }
@@ -173,8 +195,6 @@ void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
         }
     }
 
-
-
     unsigned reqres = data[idx++];
     if (reqres != E1_R_DATA && reqres != E1_R_REQ) {
         std::cerr << "invalid msg type " << std::hex << reqres << std::dec << std::endl;
@@ -182,41 +202,35 @@ void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
 
     unsigned datatype = data[idx++];
 
-    // if(reqres==0x7f && datatype==0x7b) {
-    //     // invalid from firmware 1.1.6
-    //     std::cerr << "fudge info json resp" << std::endl;
-    //     reqres = E1_R_DATA;
-    //     datatype = E1_T_INFO;
-    //     idx--;
-    // }
-
     switch (reqres) {
     case E1_R_DATA : {
         unsigned jsonsz = sz - idx - 1;
-        unsigned char* json = new unsigned char[jsonsz + 1];
+        char* json = new char[jsonsz + 1];
         memcpy(json, data + idx , jsonsz);
         json[jsonsz] = 0;
+        std::string jsonstr=json;
+        delete [] json;
 
         switch (datatype) {
         case E1_T_PRESET_0 : {
-            std::cerr << "preset json: " << json << std::endl;
+            parent_->onPreset(jsonstr);
             break;
         }
         case E1_T_CONFIG : {
-            std::cerr << "config json: " << json << std::endl;
+            parent_->onConfig(jsonstr);
             break;
         }
         case E1_T_INFO : {
-            std::cerr << "info json: " << json << std::endl;
+            parent_->onInfo(jsonstr);
             break;
         }
         default: {
+            // parent_->onError("invalid data type");
             std::cerr << "invalid data type" << std::hex << datatype << std::dec << std::endl;
         }
         }
 
 
-        delete [] json;
         break;
     }
     case E1_R_REQ : {
@@ -274,7 +288,7 @@ void ElectraDevice::addCallback(std::shared_ptr<ElectraCallback> cb) {
     impl_->addCallback(cb);
 }
 
-std::string  ElectraDevice::getColour(ElectraDevice::Colour c) {
+electra::Color ElectraDevice::getColour(ElectraDevice::Colour c) {
     return ElectraImpl_::getColour(c);
 }
 
