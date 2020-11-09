@@ -43,7 +43,7 @@ public:
     void start(void);
     void stop(void);
 
-    static electra::Color getColour(ElectraDevice::Colour c);
+    static ElectraOnePreset::Color getColour(ElectraDevice::Colour c);
     void uploadConfig(const std::string& json);
     void uploadPreset(const std::string& json);
     void requestInfo();
@@ -67,7 +67,7 @@ private:
     std::vector<std::shared_ptr<ElectraCallback>> callbacks_;
 
     MidiDevice device_;
-    electra::ElectraOnePreset jsonData_;
+    ElectraOnePreset::Preset jsonData_;
     ElectraMidiCallback midiCallback_;
 };
 
@@ -83,18 +83,18 @@ void ElectraImpl_::start() {
     }
 }
 
-electra::Color  ElectraImpl_::getColour(ElectraDevice::Colour c) {
+ElectraOnePreset::Color  ElectraImpl_::getColour(ElectraDevice::Colour c) {
     switch (c) {
-    case ElectraDevice::E_WHITE    : { return electra::Color::Ffffff;}
-    case ElectraDevice::E_RED      : { return electra::Color::F45C51;}
-    case ElectraDevice::E_ORANGE   : { return electra::Color::F49500;}
-    case ElectraDevice::E_BLUE     : { return electra::Color::The529DEC;}
-    case ElectraDevice::E_GREEN    : { return electra::Color::The03A598;}
-    case ElectraDevice::E_PINK     : { return electra::Color::C44795;}
+    case ElectraDevice::E_WHITE    : { return ElectraOnePreset::Color::Ffffff;}
+    case ElectraDevice::E_RED      : { return ElectraOnePreset::Color::F45C51;}
+    case ElectraDevice::E_ORANGE   : { return ElectraOnePreset::Color::F49500;}
+    case ElectraDevice::E_BLUE     : { return ElectraOnePreset::Color::The529DEC;}
+    case ElectraDevice::E_GREEN    : { return ElectraOnePreset::Color::The03A598;}
+    case ElectraDevice::E_PINK     : { return ElectraOnePreset::Color::C44795;}
     default:
         ;
     }
-    return electra::Color::Ffffff;
+    return ElectraOnePreset::Color::Ffffff;
 }
 
 
@@ -291,7 +291,7 @@ void ElectraDevice::addCallback(std::shared_ptr<ElectraCallback> cb) {
     impl_->addCallback(cb);
 }
 
-electra::Color ElectraDevice::getColour(ElectraDevice::Colour c) {
+ElectraOnePreset::Color ElectraDevice::getColour(ElectraDevice::Colour c) {
     return ElectraImpl_::getColour(c);
 }
 

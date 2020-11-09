@@ -48,7 +48,7 @@ int main(int argc, const char * argv[]) {
 
     nlohmann::json j;
     i >> j;
-    electra::ElectraOnePreset data;
+    ElectraOnePreset::Preset data;
     nlohmann::from_json(j, data);
     std::cerr << "project_id " << data.project_id << std::endl;
 

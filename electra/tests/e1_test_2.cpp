@@ -61,14 +61,14 @@ void createBounds(std::vector<int64_t>& e, unsigned x, unsigned y, unsigned h, u
 
 
 
-void createFader(electra::Control& p, unsigned x, unsigned y, unsigned h, unsigned w) {
-    p.type = electra::ControlType::Fader;
+void createFader(ElectraOnePreset::Control& p, unsigned x, unsigned y, unsigned h, unsigned w) {
+    p.type = ElectraOnePreset::ControlType::Fader;
     createBounds(p.bounds, x, y, h, w);
 }
 
-void createCCMessage(electra::Message& m, unsigned cc) {
+void createCCMessage(ElectraOnePreset::Message& m, unsigned cc) {
     m.device_id = 1;
-    m.type = electra::MidiMsgType::Cc7;
+    m.type = ElectraOnePreset::MidiMsgType::Cc7;
     m.parameter_number = std::make_shared<int64_t>(cc);
     m.off_value = std::make_shared<int64_t>(0);
     m.on_value = std::make_shared<int64_t>(127);
@@ -76,7 +76,7 @@ void createCCMessage(electra::Message& m, unsigned cc) {
     m.max = std::make_shared<int64_t>(127);
 }
 
-void createValue(electra::Value& v) {
+void createValue(ElectraOnePreset::Value& v) {
     v.min = std::make_shared<int64_t>(0);
     v.max = std::make_shared<int64_t>(100);
     // v.default_value = std::make_shared<int64_t>(0); //null
@@ -85,55 +85,55 @@ void createValue(electra::Value& v) {
 }
 
 
-void createControl(electra::Control& p) {
+void createControl(ElectraOnePreset::Control& p) {
     p.id = 1;
     createFader(p, 0, 0, 100, 100);
-    p.color = std::make_shared<electra::Color>(ElectraLite::ElectraDevice::getColour(ElectraLite::ElectraDevice::E_RED));
+    p.color = std::make_shared<ElectraOnePreset::Color>(ElectraLite::ElectraDevice::getColour(ElectraLite::ElectraDevice::E_RED));
     p.control_set_id = 1;
     p.page_id = 1;
 
-    // p.mode = std::make_shared<electra::PadMode>(electra::PadMode::Momentary);
+    // p.mode = std::make_shared<ElectraOnePreset::PadMode>(ElectraOnePreset::PadMode::Momentary);
     p.name = std::make_shared<std::string>("reso");
 
-    p.inputs = std::make_shared<std::vector<electra::Input>>() ;
-    electra::Input inp;
+    p.inputs = std::make_shared<std::vector<ElectraOnePreset::Input>>() ;
+    ElectraOnePreset::Input inp;
     inp.pot_id = 1;
-    inp.value_id = electra::ValueId::Value;
+    inp.value_id = ElectraOnePreset::ValueId::Value;
     p.inputs->push_back(inp);
 
-    electra::Value val;
-    val.id = std::make_shared<electra::ValueId>(electra::ValueId::Value);
+    ElectraOnePreset::Value val;
+    val.id = std::make_shared<ElectraOnePreset::ValueId>(ElectraOnePreset::ValueId::Value);
     createValue(val);
     p.values.push_back(val);
 }
 
 
-void buildPreset(electra::ElectraOnePreset& p) {
+void buildPreset(ElectraOnePreset::Preset& p) {
     p.version = 2;
     p.name = "Orac";
     p.project_id = std::make_shared<std::string>("Orac-e1-v1");
 
     {
-        p.pages = std::make_shared < std::vector<electra::Page>>();
-        electra::Page e;
+        p.pages = std::make_shared < std::vector<ElectraOnePreset::Page>>();
+        ElectraOnePreset::Page e;
         e.id = 1;
         e.name = "A1:page 1";
         p.pages->push_back(e);
     }
 
     {
-        p.groups = std::make_shared<std::vector<electra::Group>>();
-        // electra::Group e;
+        p.groups = std::make_shared<std::vector<ElectraOnePreset::Group>>();
+        // ElectraOnePreset::Group e;
         // e.page_id = 1;
         // e.name="group1";
         // createBounds(e.bounds, 0,0,10,10);
-        // p.color = std::make_shared<electra::Color>(ElectraLite::ElectraDevice::getColour(ElectraLite::ElectraDevice::E_RED));
+        // p.color = std::make_shared<ElectraOnePreset::Color>(ElectraLite::ElectraDevice::getColour(ElectraLite::ElectraDevice::E_RED));
         // p.groups->push_back(e);
     }
 
     {
-        p.devices = std::make_shared < std::vector<electra::Device>>();
-        electra::Device e;
+        p.devices = std::make_shared < std::vector<ElectraOnePreset::Device>>();
+        ElectraOnePreset::Device e;
         e.id = 1;
         e.name = "orac";
         e.channel = 1;
@@ -142,11 +142,11 @@ void buildPreset(electra::ElectraOnePreset& p) {
     }
 
     {
-        p.overlays = std::make_shared < std::vector<electra::Overlay>>();
+        p.overlays = std::make_shared < std::vector<ElectraOnePreset::Overlay>>();
 
-        electra::Overlay e;
+        ElectraOnePreset::Overlay e;
         e.id = 1;
-        electra::OverlayItem items[2];
+        ElectraOnePreset::OverlayItem items[2];
         items[0].value = 1;
         items[0].label = "OFF";
         items[1].value = 127;
@@ -157,8 +157,8 @@ void buildPreset(electra::ElectraOnePreset& p) {
     }
 
     {
-        p.controls = std::make_shared < std::vector<electra::Control>>();
-        electra::Control e;
+        p.controls = std::make_shared < std::vector<ElectraOnePreset::Control>>();
+        ElectraOnePreset::Control e;
         createControl(e);
         p.controls->push_back(e);
     }
@@ -187,7 +187,7 @@ int main(int argc, const char * argv[]) {
     device.requestPreset();
     while (keepRunning) {
         if (counter == 1) {
-            electra::ElectraOnePreset preset;
+            ElectraOnePreset::Preset preset;
             buildPreset(preset);
             nlohmann::json j;
             nlohmann::to_json(j, preset);

@@ -45,7 +45,7 @@ public:
         E_PINK,
         E_MAX_COLOR
     };
-    static electra::Color getColour(ElectraDevice::Colour c);
+    static ElectraOnePreset::Color getColour(ElectraDevice::Colour c);
 
 
     void addCallback(std::shared_ptr<ElectraCallback>);
