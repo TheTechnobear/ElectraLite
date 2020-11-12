@@ -82,11 +82,11 @@ class MidiCallback {
 public:
     MidiCallback () = default;
     virtual ~MidiCallback () = default;    
-    virtual void noteOn(unsigned n, unsigned v)  { ; }
-    virtual void noteOff(unsigned n, unsigned v) { ; }
-    virtual void cc(unsigned cc, unsigned v) { ; }
-    virtual void pitchbend(int v)  { ; } // +/- 8192
-    virtual void ch_pressure(unsigned v) { ; }
+    virtual void noteOn(unsigned ch, unsigned n, unsigned v)  { ; }
+    virtual void noteOff(unsigned ch, unsigned n, unsigned v) { ; }
+    virtual void cc(unsigned ch, unsigned cc, unsigned v) { ; }
+    virtual void pitchbend(unsigned ch, int v)  { ; } // +/- 8192
+    virtual void ch_pressure(unsigned ch, unsigned v) { ; }
 
     virtual void process(const MidiMsg& msg);
 };

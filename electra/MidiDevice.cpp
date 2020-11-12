@@ -88,28 +88,28 @@ void  MidiCallback::process(const MidiMsg& msg) {
     switch (type) {
     case 0x90: {
         if (data2 > 0) {
-            noteOn(data1, data2);
+            noteOn(ch,data1, data2);
         } else {
-            noteOff(data1, 0);
+            noteOff(ch,data1, 0);
         }
         break;
     }
 
     case 0x80: {
-        noteOff(data1, data2);
+        noteOff(ch,data1, data2);
         break;
     }
     case 0xB0: {
-        cc(data1, data2);
+        cc(ch,data1, data2);
         break;
     }
     case 0xD0: {
-        ch_pressure(data1);
+        ch_pressure(ch,data1);
         break;
     }
     case 0xE0: {
         int v = (((data2 << 7) + data1)) - 8192;
-        pitchbend(v);
+        pitchbend(ch,v);
         break;
     }
     default: {

@@ -13,9 +13,18 @@ public:
     virtual void onInit()   {;}
     virtual void onDeinit() {;}
     virtual void onError(unsigned err, const char *errStr) {;}
+    
+    // device
     virtual void onInfo(const std::string& json) {;}
     virtual void onPreset(const std::string& json) {;}
     virtual void onConfig(const std::string& json) {;}
+
+    // midi
+    virtual void noteOn(unsigned ch, unsigned n, unsigned v)  { ; }
+    virtual void noteOff(unsigned ch, unsigned n, unsigned v) { ; }
+    virtual void cc(unsigned ch, unsigned cc, unsigned v) { ; }
+    virtual void pitchbend(unsigned ch, int v)  { ; } // +/- 8192
+    virtual void ch_pressure(unsigned ch, unsigned v) { ; }
 };
 
 class ElectraImpl_;

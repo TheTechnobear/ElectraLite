@@ -24,11 +24,11 @@ static const char* E1_Midi_Device_Port2 = "Electra Controller Electra Port 2";
 class ElectraMidiCallback : public MidiCallback {
 public:
     ElectraMidiCallback(ElectraImpl_* parent) : parent_(parent) { ; }
-    // void noteOn(unsigned n, unsigned v)     override    { std::cerr << "note on      : " << n  << " - " << v << std::endl;}
-    // void noteOff(unsigned n, unsigned v)    override    { std::cerr << "note off     : " << n  << " - " << v << std::endl;}
-    // void cc(unsigned cc, unsigned v)        override    { std::cerr << "cc           : " << cc << " - " << v << std::endl;}
-    // void pitchbend(int v)                   override    { std::cerr << "pitchbend    : " << v  << std::endl;}
-    // void ch_pressure(unsigned v)            override    { std::cerr << "ch_pressure  : " << v  << std::endl;}
+    void noteOn(unsigned ch, unsigned n, unsigned v)     override;
+    void noteOff(unsigned ch, unsigned n, unsigned v)    override;
+    void cc(unsigned ch, unsigned cc, unsigned v)        override;
+    void pitchbend(unsigned ch, int v)                   override;
+    void ch_pressure(unsigned ch, unsigned v)            override;
     void process(const MidiMsg& msg) override;
     void sysex(const unsigned char* data, unsigned sz);
 private:
@@ -59,10 +59,16 @@ private:
 
     void sendSysEx(unsigned type, const char* data, unsigned len);
 
+    // callbacks
     void onInfo(const std::string& json);
     void onPreset(const std::string& json);
     void onConfig(const std::string& json);
 
+    void noteOn(unsigned ch, unsigned n, unsigned v);
+    void noteOff(unsigned ch, unsigned n, unsigned v);
+    void cc(unsigned ch, unsigned cc, unsigned v);
+    void pitchbend(unsigned ch, int v);
+    void ch_pressure(unsigned ch, unsigned v);
 
     std::vector<std::shared_ptr<ElectraCallback>> callbacks_;
 
@@ -72,7 +78,7 @@ private:
 };
 
 //---------------------
-ElectraImpl_::ElectraImpl_() :midiCallback_(this)
+ElectraImpl_::ElectraImpl_() : midiCallback_(this)
 {
 }
 
@@ -146,6 +152,36 @@ void ElectraImpl_::onConfig(const std::string& json) {
     }
 }
 
+void ElectraImpl_::noteOn(unsigned ch, unsigned n, unsigned v) {
+    for (auto cb : callbacks_) {
+        cb->noteOn(ch, n, v);
+    }
+}
+
+void ElectraImpl_::noteOff(unsigned ch, unsigned n, unsigned v) {
+    for (auto cb : callbacks_) {
+        cb->noteOff(ch, n, v);
+    }
+}
+
+void ElectraImpl_::cc(unsigned ch, unsigned cc, unsigned v) {
+    for (auto cb : callbacks_) {
+        cb->cc(ch, cc, v);
+    }
+}
+
+void ElectraImpl_::pitchbend(unsigned ch, int v) {
+    for (auto cb : callbacks_) {
+        cb->pitchbend(ch, v);
+    }
+}
+
+void ElectraImpl_::ch_pressure(unsigned ch, unsigned v) {
+    for (auto cb : callbacks_) {
+        cb->ch_pressure(ch, v);
+    }
+}
+
 void ElectraImpl_::uploadConfig(const std::string& json) {
     sendSysEx(E1_T_CONFIG, json.c_str(), json.length());
 }
@@ -182,7 +218,6 @@ void ElectraMidiCallback::process(const MidiMsg& msg) {
     }
 }
 
-
 void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
     unsigned idx = 0;
     unsigned status = data[idx++]; // FO
@@ -211,7 +246,7 @@ void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
         char* json = new char[jsonsz + 1];
         memcpy(json, data + idx , jsonsz);
         json[jsonsz] = 0;
-        std::string jsonstr=json;
+        std::string jsonstr = json;
         delete [] json;
 
         switch (datatype) {
@@ -246,6 +281,27 @@ void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
     }
     }
 }
+
+
+void ElectraMidiCallback::noteOn(unsigned ch, unsigned n, unsigned v) {
+    parent_->noteOn(ch, n, v);
+}
+void ElectraMidiCallback::noteOff(unsigned ch, unsigned n, unsigned v) {
+    parent_->noteOff(ch, n, v);
+}
+
+void ElectraMidiCallback::cc(unsigned ch, unsigned cc, unsigned v) {
+    parent_->cc(ch, cc, v);
+}
+
+void ElectraMidiCallback::pitchbend(unsigned ch, int v) {
+    parent_->pitchbend(ch, v);
+}
+
+void ElectraMidiCallback::ch_pressure(unsigned ch, unsigned v) {
+    parent_->ch_pressure(ch, v);
+}
+
 
 //---------------------
 

@@ -29,11 +29,11 @@ ElectraLite::MidiDevice d;
 
 class DumpMidiCallback : public ElectraLite::MidiCallback {
 public:
-    void noteOn(unsigned n, unsigned v)     override    { std::cerr << "note on      : " << n  << " - " << v << std::endl;}
-    void noteOff(unsigned n, unsigned v)    override    { std::cerr << "note off     : " << n  << " - " << v << std::endl;}
-    void cc(unsigned cc, unsigned v)        override    { std::cerr << "cc           : " << cc << " - " << v << std::endl;}
-    void pitchbend(int v)                   override    { std::cerr << "pitchbend    : " << v  << std::endl;}
-    void ch_pressure(unsigned v)            override    { std::cerr << "ch_pressure  : " << v  << std::endl;}
+    void noteOn(unsigned ch,unsigned n, unsigned v)     override    { std::cerr << "note on      : " << n  << " - " << v << std::endl;}
+    void noteOff(unsigned ch,unsigned n, unsigned v)    override    { std::cerr << "note off     : " << n  << " - " << v << std::endl;}
+    void cc(unsigned ch,unsigned cc, unsigned v)        override    { std::cerr << "cc           : " << cc << " - " << v << std::endl;}
+    void pitchbend(unsigned ch,int v)                   override    { std::cerr << "pitchbend    : " << v  << std::endl;}
+    void ch_pressure(unsigned ch,unsigned v)            override    { std::cerr << "ch_pressure  : " << v  << std::endl;}
 };
 
 static const char* E1_Midi_Device_Ctrl  = "Electra Controller Electra CTRL";
