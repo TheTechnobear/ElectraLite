@@ -16,11 +16,6 @@
 namespace ElectraLite {
 
 
-static const char* E1_Midi_Device_Ctrl  = "Electra Controller Electra CTRL";
-static const char* E1_Midi_Device_Port1 = "Electra Controller Electra Port 1";
-static const char* E1_Midi_Device_Port2 = "Electra Controller Electra Port 2";
-
-
 class ElectraMidiCallback : public MidiCallback {
 public:
     ElectraMidiCallback(ElectraImpl_* parent) : parent_(parent) { ; }
@@ -37,7 +32,7 @@ private:
 
 class ElectraImpl_ {
 public:
-    ElectraImpl_(void);
+    ElectraImpl_(const std::string& device);
 
     ~ElectraImpl_(void) = default;
     void start(void);
@@ -72,18 +67,19 @@ private:
 
     std::vector<std::shared_ptr<ElectraCallback>> callbacks_;
 
+    std::string devname_;
     MidiDevice device_;
     ElectraOnePreset::Preset jsonData_;
     ElectraMidiCallback midiCallback_;
 };
 
 //---------------------
-ElectraImpl_::ElectraImpl_() : midiCallback_(this)
+ElectraImpl_::ElectraImpl_(const std::string& device) : devname_(device), midiCallback_(this)
 {
 }
 
 void ElectraImpl_::start() {
-    device_.init(E1_Midi_Device_Ctrl, E1_Midi_Device_Ctrl);
+    device_.init(devname_.c_str(), devname_.c_str());
     for (auto cb : callbacks_) {
         cb->onInit();
     }
@@ -305,7 +301,7 @@ void ElectraMidiCallback::ch_pressure(unsigned ch, unsigned v) {
 
 //---------------------
 
-ElectraDevice::ElectraDevice() : impl_(new ElectraImpl_()) {
+ElectraDevice::ElectraDevice(const std::string& d) : impl_(new ElectraImpl_(d)) {
 }
 
 ElectraDevice::~ElectraDevice() {

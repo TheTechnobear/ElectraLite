@@ -31,7 +31,7 @@ class ElectraImpl_;
 
 class ElectraDevice {
 public:
-    ElectraDevice();
+    ElectraDevice(const std::string& device);
     virtual ~ElectraDevice();
     void start();
     void stop();

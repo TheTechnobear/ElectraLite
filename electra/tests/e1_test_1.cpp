@@ -9,6 +9,10 @@
 
 #include "ElectraSchema.h"
 
+static const char* E1_Midi_Device_Ctrl  = "Electra Controller Electra CTRL";
+static const char* E1_Midi_Device_Port1 = "Electra Controller Electra Port 1";
+static const char* E1_Midi_Device_Port2 = "Electra Controller Electra Port 2";
+
 
 static volatile bool keepRunning = 1;
 
@@ -35,10 +39,6 @@ public:
     void pitchbend(unsigned ch,int v)                   override    { std::cerr << "pitchbend    : " << v  << std::endl;}
     void ch_pressure(unsigned ch,unsigned v)            override    { std::cerr << "ch_pressure  : " << v  << std::endl;}
 };
-
-static const char* E1_Midi_Device_Ctrl  = "Electra Controller Electra CTRL";
-static const char* E1_Midi_Device_Port1 = "Electra Controller Electra Port 1";
-static const char* E1_Midi_Device_Port2 = "Electra Controller Electra Port 2";
 
 int main(int argc, const char * argv[]) {
     signal(SIGINT, intHandler);
