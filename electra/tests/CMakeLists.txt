@@ -14,11 +14,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   target_link_libraries(e1_test_1 atomic)
 endif()
 
-if(APPLE)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(e1_test_1  "-framework CoreServices -framework CoreFoundation -framework IOKit -framework CoreAudio")
-elseif(UNIX) 
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(e1_test_1 pthread)
-endif(APPLE)
+endif()
 
 
 
@@ -35,8 +35,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   target_link_libraries(e1_test_2 atomic)
 endif()
 
-if(APPLE)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(e1_test_2  "-framework CoreServices -framework CoreFoundation -framework IOKit -framework CoreAudio")
-elseif(UNIX) 
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(e1_test_2 pthread)
-endif(APPLE)
+endif()
