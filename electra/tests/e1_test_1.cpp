@@ -10,10 +10,6 @@
 
 #include "ElectraSchema.h"
 
-static const char* E1_Midi_Device_Ctrl  = "Electra Controller Electra CTRL";
-static const char* E1_Midi_Device_Port1 = "Electra Controller Electra Port 1";
-static const char* E1_Midi_Device_Port2 = "Electra Controller Electra Port 2";
-
 
 static volatile bool keepRunning = 1;
 
@@ -34,16 +30,17 @@ ElectraLite::RtMidiDevice d;
 
 class DumpMidiCallback : public ElectraLite::MidiCallback {
 public:
-    void noteOn(unsigned ch,unsigned n, unsigned v)     override    { std::cerr << "note on      : " << n  << " - " << v << std::endl;}
-    void noteOff(unsigned ch,unsigned n, unsigned v)    override    { std::cerr << "note off     : " << n  << " - " << v << std::endl;}
-    void cc(unsigned ch,unsigned cc, unsigned v)        override    { std::cerr << "cc           : " << cc << " - " << v << std::endl;}
-    void pitchbend(unsigned ch,int v)                   override    { std::cerr << "pitchbend    : " << v  << std::endl;}
-    void ch_pressure(unsigned ch,unsigned v)            override    { std::cerr << "ch_pressure  : " << v  << std::endl;}
+    void noteOn(unsigned ch,unsigned n, unsigned v)     override    { std::cerr << "note on      : " << ch << " : " << n  << " - " << v << std::endl;}
+    void noteOff(unsigned ch,unsigned n, unsigned v)    override    { std::cerr << "note off     : " << ch << " : " << n  << " - " << v << std::endl;}
+    void cc(unsigned ch,unsigned cc, unsigned v)        override    { std::cerr << "cc           : " << ch << " : " << cc << " - " << v << std::endl;}
+    void pitchbend(unsigned ch,int v)                   override    { std::cerr << "pitchbend    : " << ch << " : " << v  << std::endl;}
+    void ch_pressure(unsigned ch,unsigned v)            override    { std::cerr << "ch_pressure  : " << ch << " : " << v  << std::endl;}
 };
 
 int main(int argc, const char * argv[]) {
     signal(SIGINT, intHandler);
 
+    /*
     std::cerr << "testing : " << argv[1] << std::endl;
     std::ifstream i(argv[1]);
 
@@ -52,10 +49,14 @@ int main(int argc, const char * argv[]) {
     ElectraOnePreset::Preset data;
     nlohmann::from_json(j, data);
     std::cerr << "project_id " << data.project_id << std::endl;
+    */
 
+    unsigned cc46=0;
     DumpMidiCallback myCallback;
-    d.init(E1_Midi_Device_Port1,E1_Midi_Device_Port1);
+    d.init(argv[1],argv[1]);
     while (keepRunning) {
+        cc46=(cc46+1) %127; 
+        d.sendCC(0,46,cc46);
         d.processIn(myCallback);
         d.processOut();
         sleep(1);
