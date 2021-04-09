@@ -1,5 +1,6 @@
 #include "ElectraDevice.h"
 #include "MidiDevice.h"
+#include "RtMidiDevice.h"
 #include <iostream>
 #include <unistd.h>
 #include <iomanip>
@@ -29,7 +30,7 @@ void intHandler(int dummy) {
 
 
 
-ElectraLite::MidiDevice d;
+ElectraLite::RtMidiDevice d;
 
 class DumpMidiCallback : public ElectraLite::MidiCallback {
 public:

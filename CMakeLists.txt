@@ -28,6 +28,14 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
+#set(USE_LIBRE_MIDI on)
+set(USE_LIBRE_MIDI off)
+
+if(USE_LIBRE_MIDI)
+    set(CMAKE_CXX_STANDARD 17)
+endif()
+
+
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -ffast-math -funroll-loops -fomit-frame-pointer")
 
 if (SALT) 
@@ -115,6 +123,18 @@ add_subdirectory(external/moodycamel)
 #add_subdirectory(external/oscpack oscpack)
 #add_subdirectory(external/portaudio portaudio)
 
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    message("system : macos ")
+    if(NOT CMAKE_OSX_ARCHITECTURES)
+        set(CMAKE_OSX_ARCHITECTURES "x86_64")
+    endif()
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message("system : linux ")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message("system : windows ")
+    message("windows support limited")
+endif()
 
 add_subdirectory(electra)
 

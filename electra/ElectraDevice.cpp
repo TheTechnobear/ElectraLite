@@ -9,11 +9,19 @@
 #include <readerwriterqueue.h>
 
 #include "ElectraMidi.h"
-#include "MidiDevice.h"
 #include "ElectraSchema.h"
+
+#ifdef USE_LIBRE_MIDI
+#include "LibreMidiDevice.h"
+using MIDI_TYPE_DEVICE = ElectraLite::LibreMidiDevice;
+#else
+#include "RtMidiDevice.h"
+using MIDI_TYPE_DEVICE = ElectraLite::RtMidiDevice;
+#endif
 
 
 namespace ElectraLite {
+
 
 
 class ElectraMidiCallback : public MidiCallback {
@@ -68,7 +76,7 @@ private:
     std::vector<std::shared_ptr<ElectraCallback>> callbacks_;
 
     std::string devname_;
-    MidiDevice device_;
+    MIDI_TYPE_DEVICE device_;
     ElectraOnePreset::Preset jsonData_;
     ElectraMidiCallback midiCallback_;
 };
@@ -124,7 +132,7 @@ void ElectraImpl_::sendSysEx(unsigned type, const char* data, unsigned len) {
     }
     midi[byte++] = 0xF7;
 
-    device_.send(midi, sz);
+    device_.sendBytes(midi, sz);
 }
 
 
