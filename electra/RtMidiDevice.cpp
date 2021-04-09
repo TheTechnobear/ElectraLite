@@ -21,7 +21,7 @@ extern unsigned int portInfo(snd_seq_t *seq, snd_seq_port_info_t *pinfo, unsigne
 
 // Imported from RtMidi library.
 
-bool findMidiPortId(unsigned &result, const std::string &portName, bool outputPort) {
+bool RtMidiFindMidiPortId(unsigned &result, const std::string &portName, bool outputPort) {
     snd_seq_t *seq;
     if (snd_seq_open(&seq, "default", SND_SEQ_OPEN_INPUT, 0) < 0)
         return false;
