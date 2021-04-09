@@ -9,9 +9,6 @@
 
 #include "ElectraSchema.h"
 
-static const char* E1_Midi_Device_Ctrl  = "Electra Controller Electra CTRL";
-static const char* E1_Midi_Device_Port1 = "Electra Controller Electra Port 1";
-static const char* E1_Midi_Device_Port2 = "Electra Controller Electra Port 2";
 
 static volatile bool keepRunning = 1;
 
@@ -24,7 +21,6 @@ private:
     }
 };
 
-ElectraLite::ElectraDevice device(E1_Midi_Device_Ctrl);
 
 void intHandler(int dummy) {
     std::cerr << "ElectraTest intHandler called" << std::endl;
@@ -181,6 +177,7 @@ static void removeNullsFromJson(nlohmann::json & json) {
 
 int main(int argc, const char * argv[]) {
     signal(SIGINT, intHandler);
+    ElectraLite::ElectraDevice device(argv[1]);
 
     device.addCallback(std::make_shared<DumpElectraCallback>());
     unsigned counter = 0;
