@@ -40,3 +40,22 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(e1_test_2 pthread)
 endif()
+
+
+
+# e1_test_3
+set(e1_test_3_src "e1_test_3.cpp")
+add_executable(e1_test_3 ${e1_test_3_src})
+#target_link_libraries (e1_test_3 electralite portaudio)
+target_link_libraries (e1_test_3 rtmidi)
+target_link_libraries (e1_test_3 electralite)
+
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+    target_link_libraries(e1_test_3 atomic)
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_link_libraries(e1_test_3  "-framework CoreServices -framework CoreFoundation -framework IOKit -framework CoreAudio")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_libraries(e1_test_3 pthread)
+endif()

@@ -230,9 +230,9 @@ void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
     }
 
     unsigned reqres = data[idx++];
-    if (reqres != E1_R_DATA && reqres != E1_R_REQ) {
-        std::cerr << "invalid msg type " << std::hex << reqres << std::dec << std::endl;
-    }
+    // if (reqres != E1_R_DATA && reqres != E1_R_REQ && reqres != E1_R_LOG)) {
+    //     std::cerr << "sysex: invalid msg type " << std::hex << reqres << std::dec << std::endl;
+    // }
 
     unsigned datatype = data[idx++];
 
@@ -260,7 +260,7 @@ void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
         }
         default: {
             // parent_->onError("invalid data type");
-            std::cerr << "invalid data type" << std::hex << datatype << std::dec << std::endl;
+            std::cerr << "sysex: invalid data type " << std::hex << datatype << std::dec << std::endl;
         }
         }
 
@@ -271,8 +271,12 @@ void ElectraMidiCallback::sysex(const unsigned char* data, unsigned sz) {
         // not handling requests - yet
         break;
     }
+    case E1_R_LOG : {
+        // not handling log - yet
+        break;
+    }
     default: {
-        std::cerr << "invalid msg type" << std::hex << reqres << std::dec << std::endl;
+        std::cerr << "sysex: invalid msg type " << std::hex << reqres << std::dec << std::endl;
         break;
     }
     }

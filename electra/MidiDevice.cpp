@@ -121,6 +121,7 @@ void  MidiCallback::process(const MidiMsg& msg) {
 ////////////////////////////////////////////////
 MidiDevice::MidiDevice() :
     active_(false), inQueue_(MAX_QUEUE_SIZE), outQueue_(MAX_QUEUE_SIZE) {
+    LOG_0("Using rtmidi " << RtMidi::getVersion());
 }
 
 MidiDevice::~MidiDevice() {

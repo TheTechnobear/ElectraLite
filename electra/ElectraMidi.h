@@ -34,7 +34,8 @@ static const uint8_t E1_Manufacturer[] = {0x00, 0x21, 0x45};
 
 enum E1_REQRES {
     E1_R_DATA   = 0x01,
-    E1_R_REQ    = 0x02
+    E1_R_REQ    = 0x02,
+    E1_R_LOG    = 0x7F
 };
 
 enum E1_DATA_TYPE {
