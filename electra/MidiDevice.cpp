@@ -10,7 +10,7 @@
 
 namespace ElectraLite {
     
-static constexpr int MAX_QUEUE_SIZE = 256;
+static constexpr int MAX_QUEUE_SIZE = 512;
 
 
 ////////////////////////////////////////////////
