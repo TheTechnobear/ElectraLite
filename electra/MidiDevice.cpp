@@ -10,7 +10,7 @@
 
 namespace ElectraLite {
     
-static constexpr int MAX_QUEUE_SIZE = 128;
+static constexpr int MAX_QUEUE_SIZE = 1024;
 
 
 ////////////////////////////////////////////////
@@ -80,12 +80,14 @@ bool MidiDevice::processIn(MidiCallback & cb) {
     return true;
 }
 
-bool MidiDevice::processOut() {
+bool MidiDevice::processOut(unsigned maxMsgs) {
     bool sendMsg = active_;
     MidiMsg msg;
-    while (nextOutMsg(msg)) {
+    unsigned mCnt=0;
+    while ((maxMsgs==0 || mCnt < maxMsgs) && nextOutMsg(msg) ) {
         if (sendMsg) {
             sendMsg = send(msg);
+            mCnt++;
         }
         msg.destroy();
     }

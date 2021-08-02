@@ -108,7 +108,7 @@ public:
     virtual ~MidiDevice();
     virtual bool init(const char *indevice, const char *outdevice, bool virtualOutput = false);
     virtual bool processIn(MidiCallback &cb);
-    virtual bool processOut();
+    virtual bool processOut(unsigned maxMsgs=0);
     virtual void deinit();
     virtual bool isActive();
 
