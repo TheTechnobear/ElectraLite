@@ -76,9 +76,25 @@ namespace ElectraLite {
 ////////////////////////////////////////////////
 RtMidiDevice::RtMidiDevice(unsigned inQueueSize, unsigned outQueueSize) : MidiDevice(inQueueSize,outQueueSize) {
     LOG_0("Using rtmidi " << RtMidi::getVersion());
+
+    try {
+        midiInDevice_.reset(new RtMidiIn(RtMidi::Api::UNSPECIFIED, "E1 MIDI IN DEVICE"));
+    } catch (RtMidiError &error) {
+        midiInDevice_.reset();
+        LOG_0("RtMidiDevice RtMidiIn ctor error:" << error.what());
+    }
+
+    try {
+        midiOutDevice_.reset(new RtMidiOut(RtMidi::Api::UNSPECIFIED, "E1 MIDI OUT DEVICE"));
+    } catch (RtMidiError &error) {
+        midiOutDevice_.reset();
+        LOG_0("RtMidiDevice RtMidiOut ctor error:" << error.what());
+    }
 }
 
 RtMidiDevice::~RtMidiDevice() {
+    midiInDevice_.reset();
+    midiOutDevice_.reset();
 }
 
 
@@ -104,24 +120,12 @@ bool RtMidiDevice::init(const char* indevice, const char* outdevice, bool virtua
         deinit();
     }
     active_ = false;
-
-    bool found = false;
-
     if (indevice != nullptr && strlen(indevice) > 0) {
-
-        try {
-            midiInDevice_.reset(new RtMidiIn(RtMidi::Api::UNSPECIFIED, "MEC MIDI IN DEVICE"));
-        } catch (RtMidiError &error) {
-            midiInDevice_.reset();
-            LOG_0("RtMidiDevice RtMidiIn ctor error:" << error.what());
-            return false;
-        }
 
         unsigned port;
         if (RtMidiFindMidiPortId(port, indevice, false)) {
             try {
                 midiInDevice_->openPort(port, "MIDI IN");
-                found = true;
                 LOG_1("RtMidiDevice Midi input opened : " << indevice);
             } catch (RtMidiError &error) {
                 LOG_0("RtMidiDevice Midi input open error:" << error.what());
@@ -134,7 +138,6 @@ bool RtMidiDevice::init(const char* indevice, const char* outdevice, bool virtua
             for (unsigned i = 0; i < midiInDevice_->getPortCount(); i++) {
                 LOG_0("[" << midiInDevice_->getPortName(i) << "]");
             }
-            midiInDevice_.reset();
             return false;
         }
         bool midiSysex = false;
@@ -145,13 +148,6 @@ bool RtMidiDevice::init(const char* indevice, const char* outdevice, bool virtua
     } //midi input
 
     if (outdevice != nullptr && strlen(outdevice) > 0) {
-        try {
-            midiOutDevice_.reset(new RtMidiOut(RtMidi::Api::UNSPECIFIED, "MEC MIDI OUT DEVICE"));
-        } catch (RtMidiError &error) {
-            midiOutDevice_.reset();
-            LOG_0("RtMidiDevice RtMidiOut ctor error:" << error.what());
-            return false;
-        }
         if (virtualOutput) {
             try {
                 midiOutDevice_->openVirtualPort(outdevice);
@@ -160,20 +156,16 @@ bool RtMidiDevice::init(const char* indevice, const char* outdevice, bool virtua
             } catch (RtMidiError &error) {
                 LOG_0("RtMidiDevice Midi virtual output create error : " << error.what());
                 virtualOpen_ = false;
-                midiOutDevice_.reset();
                 return false;
             }
         } else {
-            found = false;
             unsigned port;
             if (RtMidiFindMidiPortId(port, outdevice, true)) {
                 try {
                     midiOutDevice_->openPort(port, "MIDI OUT");
                     LOG_0("RtMidiDevice Midi output opened  :" << outdevice);
-                    found = true;
                 } catch (RtMidiError &error) {
                     LOG_0("RtMidiDevice Midi output create error : " << error.what());
-                    midiOutDevice_.reset();
                     return false;
                 }
             } else {
@@ -182,11 +174,9 @@ bool RtMidiDevice::init(const char* indevice, const char* outdevice, bool virtua
                 for (unsigned i = 0; i < midiOutDevice_->getPortCount(); i++) {
                     LOG_0("[" << midiOutDevice_->getPortName(i) << "]");
                 }
-                midiOutDevice_.reset();
             }
         }
     } // midi output
-
 
     active_ = midiInDevice_ || midiOutDevice_;
     LOG_0("RtMidiIn::init - complete, active : " <<  active_ );
@@ -197,7 +187,7 @@ bool RtMidiDevice::init(const char* indevice, const char* outdevice, bool virtua
 void RtMidiDevice::deinit() {
     LOG_0("RtMidiDevice::deinit");
     if (midiInDevice_) midiInDevice_->cancelCallback();
-    midiInDevice_.reset();
+//    midiInDevice_.reset();
     active_ = false;
 }
 
