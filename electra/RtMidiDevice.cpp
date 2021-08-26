@@ -72,8 +72,6 @@ bool RtMidiFindMidiPortId(unsigned &result, const std::string &portName, bool ou
 
 namespace ElectraLite {
     
-static constexpr int MAX_QUEUE_SIZE = 128;
-
 
 ////////////////////////////////////////////////
 RtMidiDevice::RtMidiDevice() : MidiDevice() {

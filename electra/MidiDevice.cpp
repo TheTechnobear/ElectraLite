@@ -10,8 +10,6 @@
 
 namespace ElectraLite {
     
-static constexpr int MAX_QUEUE_SIZE = 512;
-
 
 ////////////////////////////////////////////////
 void  MidiCallback::process(const MidiMsg& msg) {
@@ -55,8 +53,8 @@ void  MidiCallback::process(const MidiMsg& msg) {
 }
 
 ////////////////////////////////////////////////
-MidiDevice::MidiDevice() :
-    active_(false), inQueue_(MAX_QUEUE_SIZE), outQueue_(MAX_QUEUE_SIZE) {
+MidiDevice::MidiDevice(unsigned inQueueSize, unsigned outQueueSize) :
+    active_(false), inQueue_(inQueueSize), outQueue_(outQueueSize) {
 }
 
 MidiDevice::~MidiDevice() {
