@@ -18,7 +18,7 @@ namespace ElectraLite {
 class RtMidiDevice : public MidiDevice {
 
 public:
-    RtMidiDevice();
+    RtMidiDevice(unsigned inQueueSize=MidiDevice::MAX_QUEUE_SIZE, unsigned outQueueSize=MidiDevice::MAX_QUEUE_SIZE);
     virtual ~RtMidiDevice();
     bool init(const char* indevice, const char* outdevice, bool virtualOutput = false) override;
     void deinit() override;

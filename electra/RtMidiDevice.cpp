@@ -74,7 +74,7 @@ namespace ElectraLite {
     
 
 ////////////////////////////////////////////////
-RtMidiDevice::RtMidiDevice() : MidiDevice() {
+RtMidiDevice::RtMidiDevice(unsigned inQueueSize, unsigned outQueueSize) : MidiDevice(inQueueSize,outQueueSize) {
     LOG_0("Using rtmidi " << RtMidi::getVersion());
 }
 

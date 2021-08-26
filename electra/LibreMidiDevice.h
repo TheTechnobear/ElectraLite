@@ -19,7 +19,7 @@ namespace ElectraLite {
 class LibreMidiDevice : public MidiDevice {
 
 public:
-    LibreMidiDevice();
+    LibreMidiDevice(unsigned inQueueSize=MidiDevice::MAX_QUEUE_SIZE, unsigned outQueueSize=MidiDevice::MAX_QUEUE_SIZE);
     virtual ~LibreMidiDevice();
     bool init(const char* indevice, const char* outdevice, bool virtualOutput = false) override;
     void deinit() override;
