@@ -10,8 +10,6 @@
 
 namespace ElectraLite {
     
-static constexpr int MAX_QUEUE_SIZE = 128;
-
 
 ////////////////////////////////////////////////
 void  MidiCallback::process(const MidiMsg& msg) {
@@ -55,8 +53,8 @@ void  MidiCallback::process(const MidiMsg& msg) {
 }
 
 ////////////////////////////////////////////////
-MidiDevice::MidiDevice() :
-    active_(false), inQueue_(MAX_QUEUE_SIZE), outQueue_(MAX_QUEUE_SIZE) {
+MidiDevice::MidiDevice(unsigned inQueueSize, unsigned outQueueSize) :
+    active_(false), inQueue_(inQueueSize), outQueue_(outQueueSize) {
 }
 
 MidiDevice::~MidiDevice() {
@@ -80,12 +78,14 @@ bool MidiDevice::processIn(MidiCallback & cb) {
     return true;
 }
 
-bool MidiDevice::processOut() {
+bool MidiDevice::processOut(unsigned maxMsgs) {
     bool sendMsg = active_;
     MidiMsg msg;
-    while (nextOutMsg(msg)) {
+    unsigned mCnt=0;
+    while ((maxMsgs==0 || mCnt < maxMsgs) && nextOutMsg(msg) ) {
         if (sendMsg) {
             sendMsg = send(msg);
+            mCnt++;
         }
         msg.destroy();
     }

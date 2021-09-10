@@ -102,13 +102,14 @@ public:
 
 
 class MidiDevice {
-
 public:
-    MidiDevice();
+    static constexpr int MAX_QUEUE_SIZE = 512;
+
+    MidiDevice(unsigned inQueueSize=MAX_QUEUE_SIZE, unsigned outQueueSize=MAX_QUEUE_SIZE);
     virtual ~MidiDevice();
     virtual bool init(const char *indevice, const char *outdevice, bool virtualOutput = false);
     virtual bool processIn(MidiCallback &cb);
-    virtual bool processOut();
+    virtual bool processOut(unsigned maxMsgs=0);
     virtual void deinit();
     virtual bool isActive();
 
